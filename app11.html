@@ -1,0 +1,2231 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GCare Connect</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+         :root {
+            --primary-color: #3a86ff;
+            --secondary-color: #8338ec;
+            --accent-color: #ff006e;
+            --light-color: #f8f9ff;
+            --dark-color: #1a1a2e;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-color);
+            color: var(--dark-color);
+        }
+        
+        .sidebar {
+            background: linear-gradient(135deg, var(--dark-color), #16213e);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            padding-top: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            border-radius: 5px;
+            padding: 12px 20px;
+            margin: 5px 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar .nav-link.active {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 8px rgba(58, 134, 255, 0.3);
+        }
+        
+        .sidebar .nav-link:hover:not(.active) {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .sidebar .nav-link i {
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 30px;
+            background-color: var(--light-color);
+        }
+        
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            color: var(--dark-color);
+            font-weight: 600;
+        }
+        
+        .appointment-card {
+            border-left: 5px solid var(--primary-color);
+            margin-bottom: 15px;
+            border-radius: 8px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .appointment-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .ongoing {
+            border-left-color: var(--accent-color);
+        }
+        
+        .department-card {
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            background-color: white;
+        }
+        
+        .department-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .department-card.selected {
+            border: 2px solid var(--primary-color);
+            box-shadow: 0 0 15px rgba(58, 134, 255, 0.3);
+        }
+        
+        .department-card .card-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            font-weight: bold;
+            border-radius: 10px 10px 0 0 !important;
+        }
+        
+        .department-icon {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .calendar-container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            padding: 20px;
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            text-align: center;
+        }
+        
+        .day-name {
+            font-weight: bold;
+            padding: 10px;
+            color: var(--dark-color);
+        }
+        
+        .day {
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .day:hover {
+            background-color: rgba(58, 134, 255, 0.1);
+        }
+        
+        .day.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+        
+        .day.has-appointment {
+            position: relative;
+        }
+        
+        .day.has-appointment::after {
+            content: '';
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+        }
+        
+        .time-slots {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .time-slot {
+            padding: 12px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .time-slot:hover {
+            background-color: rgba(58, 134, 255, 0.1);
+        }
+        
+        .time-slot.available {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .time-slot.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .time-slot.booked {
+            background-color: #f8f9fa;
+            border-color: #e9ecef;
+            color: #adb5bd;
+            cursor: not-allowed;
+        }
+        
+        .modal-calendar {
+            max-width: 650px;
+        }
+        
+        .appointment-steps {
+            display: flex;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            padding-bottom: 20px;
+        }
+        
+        .step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 3px;
+            background-color: #dee2e6;
+            top: 25px;
+            left: 50%;
+            z-index: 1;
+        }
+        
+        .step.active:not(:last-child)::after {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+        
+        .step-number {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-weight: bold;
+            position: relative;
+            z-index: 2;
+            transition: all 0.3s;
+        }
+        
+        .step.active .step-number {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            box-shadow: 0 4px 8px rgba(58, 134, 255, 0.3);
+        }
+        
+        .step.completed .step-number {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+        
+        .step.completed .step-number::after {
+            content: '✓';
+            font-size: 1.2rem;
+        }
+        
+        .feedback-rating {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+        
+        .rating-btn {
+            padding: 15px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            flex: 1;
+            margin: 0 5px;
+        }
+        
+        .rating-btn:hover {
+            background-color: rgba(58, 134, 255, 0.1);
+            border-color: var(--primary-color);
+        }
+        
+        .rating-btn.selected {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-color: var(--primary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(58, 134, 255, 0.2);
+        }
+        
+        .dashboard-card {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+            overflow: hidden;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stats-card {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+        
+        .date-select-btn {
+            cursor: pointer;
+            border: 1px solid #dee2e6;
+            padding: 12px 15px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+            background-color: white;
+        }
+        
+        .date-select-btn:hover {
+            border-color: var(--primary-color);
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(58, 134, 255, 0.1);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(58, 134, 255, 0.3);
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+        }
+        
+        .btn-outline-success {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transition: all 0.3s;
+        }
+        
+        .btn-outline-success:hover {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(58, 134, 255, 0.2);
+        }
+        
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+        }
+        
+        .card:hover {
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 12px 12px 0 0 !important;
+            font-weight: 600;
+        }
+        
+        .badge {
+            padding: 6px 10px;
+            font-weight: 500;
+            border-radius: 8px;
+        }
+        
+        .bg-success {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+        }
+        
+        .bg-danger {
+            background: linear-gradient(135deg, #ff206e, #ff006e) !important;
+        }
+        
+        .bg-warning {
+            background: linear-gradient(135deg, #ffbe0b, #fb5607) !important;
+        }
+        
+        .text-success {
+            color: var(--primary-color) !important;
+        }
+        
+        .progress {
+            height: 8px;
+            border-radius: 4px;
+        }
+        
+        .progress-bar {
+            border-radius: 4px;
+        }
+        
+        .form-control,
+        .form-select {
+            border-radius: 8px;
+            padding: 10px 15px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(58, 134, 255, 0.25);
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .btn-close-white {
+            filter: invert(1);
+        }
+        
+        .sidebar-logo {
+            color: white;
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            text-align: center;
+            padding: 0 15px;
+        }
+        
+        .sidebar-logo span {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .sidebar-footer {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.8rem;
+            text-align: center;
+            margin-top: 30px;
+            padding: 0 15px;
+        }
+        
+        .tab-content {
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .table-hover tbody tr:hover {
+            background-color: rgba(58, 134, 255, 0.05);
+        }
+        
+        .table th {
+            background-color: rgba(58, 134, 255, 0.1);
+            color: var(--dark-color);
+            font-weight: 600;
+        }
+        /* Login/Signup Modal Styles */
+        
+        .auth-modal .modal-content {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .auth-modal .nav-tabs {
+            border: none;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        }
+        
+        .auth-modal .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            border: none;
+            padding: 12px 20px;
+            font-weight: 500;
+        }
+        
+        .auth-modal .nav-link.active {
+            color: white;
+            background-color: transparent;
+            border-bottom: 3px solid white;
+        }
+        
+        .auth-modal .nav-link:hover:not(.active) {
+            color: white;
+        }
+        
+        .auth-modal .tab-content {
+            padding: 25px;
+        }
+        
+        .auth-modal .form-floating label {
+            color: #6c757d;
+        }
+        
+        .auth-modal .btn-close {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            filter: invert(1);
+        }
+        
+        .auth-modal .forgot-password {
+            text-align: right;
+            margin-top: -10px;
+            margin-bottom: 15px;
+        }
+        
+        .auth-modal .social-login {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .auth-modal .social-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin: 0 5px;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .auth-modal .divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+        }
+        
+        .auth-modal .divider::before,
+        .auth-modal .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .auth-modal .divider-text {
+            padding: 0 10px;
+            color: #6c757d;
+        }
+        
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-2 sidebar">
+                <div class="sidebar-logo">
+                    <h3><span>GCare Connect</h3>
+                    <p class="small text-muted"></p>
+                </div>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#appointment" data-bs-toggle="tab">
+                            <i class="bi bi-calendar-check"></i> Appointments
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#feedback" data-bs-toggle="tab">
+                            <i class="bi bi-chat-dots"></i> Feedback
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#dashboard" data-bs-toggle="tab">
+                            <i class="bi bi-graph-up"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#departments" data-bs-toggle="tab">
+                            <i class="bi bi-building"></i> Departments
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#settings" data-bs-toggle="tab">
+                            <i class="bi bi-gear"></i> Settings
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="account-link" data-bs-toggle="modal" data-bs-target="#authModal">
+                            <i class="bi bi-person-circle"></i> Account
+                        </a>
+                    </li>
+                </ul>
+                <div class="sidebar-footer">
+                    <p>© 2025 GCare Connect</p>
+                    <p class="small">v2.1.0</p>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-10 main-content">
+                <div class="tab-content">
+                    <!-- Appointments Tab -->
+                    <div class="tab-pane fade show active" id="appointment">
+                        <h2 class="mb-4">Book an Appointment</h2>
+
+                        <div class="appointment-steps">
+                            <div class="step active">
+                                <div class="step-number">1</div>
+                                <div class="step-title">Select Department</div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">2</div>
+                                <div class="step-title">Choose Date & Time</div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">3</div>
+                                <div class="step-title">Confirm Details</div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="mb-0">Select Department</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-md-4">
+                                                        <div class="card department-card" data-department="general">
+                                                            <div class="card-body text-center">
+                                                                <i class="bi bi-clipboard-pulse department-icon"></i>
+                                                                <h5>General Medicine</h5>
+                                                                <p class="text-muted small mb-0">Primary healthcare services</p>
+                                                                <div class="mt-3 text-success">
+                                                                    <i class="bi bi-person-check-fill"></i> 8 Doctors Available
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="card department-card" data-department="cardiology">
+                                                            <div class="card-body text-center">
+                                                                <i class="bi bi-heart-pulse department-icon"></i>
+                                                                <h5>Cardiology</h5>
+                                                                <p class="text-muted small mb-0">Heart & cardiovascular care</p>
+                                                                <div class="mt-3 text-success">
+                                                                    <i class="bi bi-person-check-fill"></i> 5 Doctors Available
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="card department-card" data-department="dermatology">
+                                                            <div class="card-body text-center">
+                                                                <i class="bi bi-bandaid department-icon"></i>
+                                                                <h5>Dermatology</h5>
+                                                                <p class="text-muted small mb-0">Skin, hair & nail care</p>
+                                                                <div class="mt-3 text-success">
+                                                                    <i class="bi bi-person-check-fill"></i> 4 Doctors Available
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="card department-card" data-department="neurology">
+                                                            <div class="card-body text-center">
+                                                                <i class="bi bi-brain department-icon"></i>
+                                                                <h5>Neurology</h5>
+                                                                <p class="text-muted small mb-0">Nervous system specialists</p>
+                                                                <div class="mt-3 text-success">
+                                                                    <i class="bi bi-person-check-fill"></i> 3 Doctors Available
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="card department-card" data-department="pediatrics">
+                                                            <div class="card-body text-center">
+                                                                <i class="bi bi-emoji-smile department-icon"></i>
+                                                                <h5>Pediatrics</h5>
+                                                                <p class="text-muted small mb-0">Child & adolescent care</p>
+                                                                <div class="mt-3 text-success">
+                                                                    <i class="bi bi-person-check-fill"></i> 6 Doctors Available
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="card department-card" data-department="orthopedics">
+                                                            <div class="card-body text-center">
+                                                                <i class="bi bi-universal-access department-icon"></i>
+                                                                <h5>Orthopedics</h5>
+                                                                <p class="text-muted small mb-0">Bone & joint specialists</p>
+                                                                <div class="mt-3 text-success">
+                                                                    <i class="bi bi-person-check-fill"></i> 4 Doctors Available
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row" id="date-time-section" style="display: none;">
+                                    <div class="col-12">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="mb-0"><span id="selected-department-name">General Medicine</span> - Select Date & Time</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <label class="form-label">Select Date</label>
+                            <div class="date-select-btn" id="date-picker-btn">
+                                <span id="selected-date">Select a date</span>
+                                <i class="bi bi-calendar3"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row" id="time-slots-container" style="display: none;">
+                        <div class="col-12">
+                            <h6>Available Time Slots for <span id="selected-date-display">June 8, 2023</span></h6>
+                            <div class="time-slots">
+                                <div class="time-slot booked">9:00 AM</div>
+                                <div class="time-slot booked">10:00 AM</div>
+                                <div class="time-slot available">11:00 AM</div>
+                                <div class="time-slot available">12:00 PM</div>
+                                <div class="time-slot booked">1:00 PM</div>
+                                <div class="time-slot available">2:00 PM</div>
+                                <div class="time-slot available">3:00 PM</div>
+                                <div class="time-slot booked">4:30 PM</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <h6>Appointment Duration</h6>
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="duration" id="duration15" autocomplete="off">
+                                <label class="btn btn-outline-success" for="duration15">15 min</label>
+
+                                <input type="radio" class="btn-check" name="duration" id="duration30" autocomplete="off">
+                                <label class="btn btn-outline-success" for="duration30">30 min</label>
+
+                                <input type="radio" class="btn-check" name="duration" id="duration45" autocomplete="off">
+                                <label class="btn btn-outline-success" for="duration45">45 min</label>
+
+                                <input type="radio" class="btn-check" name="duration" id="duration60" autocomplete="off" checked>
+                                <label class="btn btn-outline-success" for="duration60">1 h</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        <button class="btn btn-success" id="proceed-to-confirmation" disabled>Proceed to Confirmation</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" id="confirmation-section" style="display: none;">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Confirm Appointment Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Department</h6>
+                            <p id="confirm-department">General Medicine</p>
+
+                            <h6>Date & Time</h6>
+                            <p id="confirm-datetime">June 8, 2023 at 3:00 PM</p>
+
+                            <h6>Duration</h6>
+                            <p id="confirm-duration">1 hour</p>
+                        </div>
+
+                        <div class="col-md-6">
+                            <h6>Doctor</h6>
+                            <select class="form-select mb-3">
+                                                            <option selected>Dr. Sarah Johnson</option>
+                                                            <option>Dr. Michael Chen</option>
+                                                            <option>Dr. Emily Rodriguez</option>
+                                                        </select>
+
+                            <h6>Appointment Type</h6>
+                            <select class="form-select mb-3">
+                                                            <option selected>In-person</option>
+                                                            <option>Video Consultation</option>
+                                                            <option>Phone Consultation</option>
+                                                        </select>
+
+                            <h6>Reason for Visit</h6>
+                            <textarea class="form-control" rows="3" placeholder="Briefly describe your reason for the appointment"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="terms-check">
+                                <label class="form-check-label" for="terms-check">
+                                                                I agree to the appointment policies and cancellation terms
+                                                            </label>
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <button class="btn btn-outline-secondary" id="back-to-datetime">Back</button>
+                                <button class="btn btn-success" id="confirm-appointment" disabled>Confirm Appointment</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Ongoing Appointments</h5>
+            </div>
+            <div class="card-body">
+                <div class="card appointment-card ongoing mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0">Video Conference</h6>
+                            <span class="badge bg-danger">Now</span>
+                        </div>
+                        <p class="text-muted small mb-2">Thursday, June 8, 2023</p>
+                        <p class="text-muted small mb-2">4:30 PM - 5:00 PM</p>
+                        <p class="text-muted small mb-0">Department: General Medicine</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Upcoming Appointments</h5>
+            </div>
+            <div class="card-body">
+                <div class="card appointment-card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0">Dr. Sarah Johnson</h6>
+                            <span class="badge bg-success">Confirmed</span>
+                        </div>
+                        <p class="text-muted small mb-2">Monday, June 12, 2023</p>
+                        <p class="text-muted small mb-2">10:00 AM - 10:30 AM</p>
+                        <p class="text-muted small mb-2">Department: Cardiology</p>
+                        <div class="d-flex mt-2">
+                            <button class="btn btn-sm btn-outline-secondary me-2">Reschedule</button>
+                            <button class="btn btn-sm btn-outline-danger">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    </div>
+
+    <!-- Feedback Tab -->
+    <div class="tab-pane fade" id="feedback">
+        <h2 class="mb-4">Patient Feedback System</h2>
+
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Provide Feedback for Your Recent Appointment</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <h6>Recent Appointment: Video Conference with Dr. Steven</h6>
+                            <p class="text-muted">Thursday, June 8, 2023, 4:30 PM - 5:00 PM</p>
+                        </div>
+
+                        <div class="mb-3">
+                            <h6>How would you rate your overall experience?</h6>
+                            <div class="feedback-rating">
+                                <div class="rating-btn" data-rating="1">
+                                    <i class="bi bi-emoji-frown fs-3 d-block"></i> Poor
+                                </div>
+                                <div class="rating-btn" data-rating="2">
+                                    <i class="bi bi-emoji-neutral fs-3 d-block"></i> Fair
+                                </div>
+                                <div class="rating-btn selected" data-rating="3">
+                                    <i class="bi bi-emoji-smile fs-3 d-block"></i> Good
+                                </div>
+                                <div class="rating-btn" data-rating="4">
+                                    <i class="bi bi-emoji-laughing fs-3 d-block"></i> Excellent
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="feedbackText" class="form-label">Please share your feedback:</label>
+                            <textarea class="form-control" id="feedbackText" rows="5" placeholder="Tell us about your experience...">The doctor was very attentive and explained everything clearly. The appointment scheduling was convenient and the video call worked without any issues.</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <h6>Would you recommend our services to others?</h6>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="recommend" id="recommendYes" checked>
+                                <label class="form-check-label" for="recommendYes">Yes</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="recommend" id="recommendNo">
+                                <label class="form-check-label" for="recommendNo">No</label>
+                            </div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button class="btn btn-success">Submit Feedback</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Your Previous Feedback</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-4 pb-4 border-bottom">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6>Appointment with Dr. Sarah Johnson (Cardiology)</h6>
+                                <span class="badge bg-success">Positive</span>
+                            </div>
+                            <p class="text-muted small">May 15, 2023</p>
+                            <p>"Dr. Johnson was very thorough and knowledgeable. She took the time to explain my condition and treatment options. The staff was courteous and the facility was clean."</p>
+                            <div class="d-flex align-items-center">
+                                <span class="me-2">Rating:</span>
+                                <i class="bi bi-star-fill text-warning"></i>
+                                <i class="bi bi-star-fill text-warning"></i>
+                                <i class="bi bi-star-fill text-warning"></i>
+                                <i class="bi bi-star-fill text-warning"></i>
+                                <i class="bi bi-star text-warning"></i>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6>Appointment with Dr. Michael Chen (Neurology)</h6>
+                                <span class="badge bg-warning text-dark">Neutral</span>
+                            </div>
+                            <p class="text-muted small">April 28, 2023</p>
+                            <p>"The doctor was professional, but I had to wait for 30 minutes past my scheduled appointment time. The reception area was a bit crowded."</p>
+                            <div class="d-flex align-items-center">
+                                <span class="me-2">Rating:</span>
+                                <i class="bi bi-star-fill text-warning"></i>
+                                <i class="bi bi-star-fill text-warning"></i>
+                                <i class="bi bi-star-fill text-warning"></i>
+                                <i class="bi bi-star text-warning"></i>
+                                <i class="bi bi-star text-warning"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Feedback Analytics</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="feedbackChart" width="100%" height="250"></canvas>
+                        <div class="mt-3">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Positive Feedback</span>
+                                <span class="fw-bold">78%</span>
+                            </div>
+                            <div class="progress mb-3">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 78%"></div>
+                            </div>
+
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Neutral Feedback</span>
+                                <span class="fw-bold">15%</span>
+                            </div>
+                            <div class="progress mb-3">
+                                <div class="progress-bar bg-warning" role="progressbar" style="width: 15%"></div>
+                            </div>
+
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Negative Feedback</span>
+                                <span class="fw-bold">7%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-danger" role="progressbar" style="width: 7%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Common Feedback Topics</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <h6 class="text-success">Positive Mentions</h6>
+                            <div class="d-flex mb-2">
+                                <span class="badge bg-success me-2">Staff Friendliness</span>
+                                <span class="small text-muted">42 mentions</span>
+                            </div>
+                            <div class="d-flex mb-2">
+                                <span class="badge bg-success me-2">Doctor Knowledge</span>
+                                <span class="small text-muted">38 mentions</span>
+                            </div>
+                            <div class="d-flex">
+                                <span class="badge bg-success me-2">Appointment Ease</span>
+                                <span class="small text-muted">25 mentions</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h6 class="text-danger">Areas for Improvement</h6>
+                            <div class="d-flex mb-2">
+                                <span class="badge bg-danger me-2">Wait Times</span>
+                                <span class="small text-muted">18 mentions</span>
+                            </div>
+                            <div class="d-flex mb-2">
+                                <span class="badge bg-danger me-2">Parking</span>
+                                <span class="small text-muted">12 mentions</span>
+                            </div>
+                            <div class="d-flex">
+                                <span class="badge bg-danger me-2">Follow-up Communication</span>
+                                <span class="small text-muted">7 mentions</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Tab -->
+    <div class="tab-pane fade" id="dashboard">
+        <h2 class="mb-4">Business Analytics Dashboard</h2>
+
+        <div class="row">
+            <div class="col-md-3 mb-4">
+                <div class="card dashboard-card stats-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Appointments</h5>
+                        <h1 class="display-4 mb-0">1,257</h1>
+                        <p class="card-text mt-3">
+                            <i class="bi bi-arrow-up"></i> 12% increase from last month
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 mb-4">
+                <div class="card dashboard-card stats-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Patient Satisfaction</h5>
+                        <h1 class="display-4 mb-0">87%</h1>
+                        <p class="card-text mt-3">
+                            <i class="bi bi-arrow-up"></i> 5% increase from last quarter
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 mb-4">
+                <div class="card dashboard-card stats-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Cancellation Rate</h5>
+                        <h1 class="display-4 mb-0">8.3%</h1>
+                        <p class="card-text mt-3">
+                            <i class="bi bi-arrow-down"></i> 2.1% decrease from last month
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 mb-4">
+                <div class="card dashboard-card stats-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Average Wait Time</h5>
+                        <h1 class="display-4 mb-0">12<small>min</small></h1>
+                        <p class="card-text mt-3">
+                            <i class="bi bi-arrow-down"></i> 3 min decrease from last quarter
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8 mb-4">
+                <div class="card dashboard-card">
+                    <div class="card-header bg-white border-0">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Appointment Trends</h5>
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-outline-secondary active">Week</button>
+                                <button class="btn btn-outline-secondary">Month</button>
+                                <button class="btn btn-outline-secondary">Year</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="appointmentChart" width="100%" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="card dashboard-card">
+                    <div class="card-header bg-white border-0">
+                        <h5 class="mb-0">Appointments by Department</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="departmentChart" width="100%" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card dashboard-card">
+                    <div class="card-header bg-white border-0">
+                        <h5 class="mb-0">Resource Utilization</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>General Medicine</span>
+                                <span>92% utilized</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 92%"></div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Cardiology</span>
+                                <span>78% utilized</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 78%"></div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Dermatology</span>
+                                <span>65% utilized</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 65%"></div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Neurology</span>
+                                <span>83% utilized</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 83%"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Pediatrics</span>
+                                <span>71% utilized</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 71%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-4">
+                <div class="card dashboard-card">
+                    <div class="card-header bg-white border-0">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Recent Feedback Analysis</h5>
+                            <button class="btn btn-sm btn-outline-success">Generate Report</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Department</th>
+                                        <th>Feedback Score</th>
+                                        <th>Sentiment</th>
+                                        <th>Trend</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>General Medicine</td>
+                                        <td>4.2/5</td>
+                                        <td><span class="badge bg-success">Positive</span></td>
+                                        <td><i class="bi bi-arrow-up text-success"></i></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Cardiology</td>
+                                        <td>4.5/5</td>
+                                        <td><span class="badge bg-success">Positive</span></td>
+                                        <td><i class="bi bi-arrow-up text-success"></i></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Dermatology</td>
+                                        <td>3.8/5</td>
+                                        <td><span class="badge bg-warning text-dark">Neutral</span></td>
+                                        <td><i class="bi bi-dash text-warning"></i></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Neurology</td>
+                                        <td>4.1/5</td>
+                                        <td><span class="badge bg-success">Positive</span></td>
+                                        <td><i class="bi bi-arrow-up text-success"></i></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Pediatrics</td>
+                                        <td>4.7/5</td>
+                                        <td><span class="badge bg-success">Positive</span></td>
+                                        <td><i class="bi bi-arrow-up text-success"></i></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Departments Tab -->
+    <div class="tab-pane fade" id="departments">
+        <h2 class="mb-4">Departments</h2>
+
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h4 class="card-title text-success">General Medicine</h4>
+                        <p class="card-text">Primary healthcare services for adults, managing various conditions and providing preventive care.</p>
+                        <ul class="list-group list-group-flush mb-3">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Available Doctors
+                                <span class="badge bg-success rounded-pill">8</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Available Time Slots
+                                <span class="badge bg-success rounded-pill">42</span>
+                            </li>
+                        </ul>
+                        <a href="#" class="btn btn-outline-success">Schedule Appointment</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h4 class="card-title text-success">Cardiology</h4>
+                        <p class="card-text">Specialized care for heart and cardiovascular conditions, including diagnostics and treatments.</p>
+                        <ul class="list-group list-group-flush mb-3">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Available Doctors
+                                <span class="badge bg-success rounded-pill">5</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Available Time Slots
+                                <span class="badge bg-success rounded-pill">28</span>
+                            </li>
+                        </ul>
+                        <a href="#" class="btn btn-outline-success">Schedule Appointment</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h4 class="card-title text-success">Dermatology</h4>
+                        <p class="card-text">Diagnosis and treatment of skin, hair, and nail conditions for patients of all ages.</p>
+                        <ul class="list-group list-group-flush mb-3">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Available Doctors
+                                <span class="badge bg-success rounded-pill">4</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Available Time Slots
+                                <span class="badge bg-success rounded-pill">22</span>
+                            </li>
+                        </ul>
+                        <a href="#" class="btn btn-outline-success">Schedule Appointment</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h4 class="card-title text-success">Neurology</h4>
+                        <p class="card-text">Medical specialty dealing with disorders of the nervous system, including brain and spinal cord.</p>
+                        <ul class="list-group list-group-flush mb-3">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Available Doctors
+                                <span class="badge bg-success rounded-pill">3</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Available Time Slots
+                                <span class="badge bg-success rounded-pill">18</span>
+                            </li>
+                        </ul>
+                        <a href="#" class="btn btn-outline-success">Schedule Appointment</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h4 class="card-title text-success">Pediatrics</h4>
+                        <p class="card-text">Specialized healthcare for infants, children, and adolescents up to 18 years of age.</p>
+                        <ul class="list-group list-group-flush mb-3">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Available Doctors
+                                <span class="badge bg-success rounded-pill">6</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Available Time Slots
+                                <span class="badge bg-success rounded-pill">35</span>
+                            </li>
+                        </ul>
+                        <a href="#" class="btn btn-outline-success">Schedule Appointment</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h4 class="card-title text-success">Orthopedics</h4>
+                        <p class="card-text">Treats conditions involving the musculoskeletal system, including bones, joints, and muscles.</p>
+                        <ul class="list-group list-group-flush mb-3">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Available Doctors
+                                <span class="badge bg-success rounded-pill">4</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Available Time Slots
+                                <span class="badge bg-success rounded-pill">26</span>
+                            </li>
+                        </ul>
+                        <a href="#" class="btn btn-outline-success">Schedule Appointment</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Tab -->
+    <div class="tab-pane fade" id="settings">
+        <h2 class="mb-4">Settings</h2>
+
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Appointment Settings</h5>
+                    </div>
+                    <div class="card-body">
+                        <form>
+                            <div class="mb-3">
+                                <label class="form-label">Default Appointment Duration</label>
+                                <div class="btn-group w-100" role="group">
+                                    <input type="radio" class="btn-check" name="defaultDuration" id="defaultDuration15" autocomplete="off">
+                                    <label class="btn btn-outline-success" for="defaultDuration15">15 min</label>
+
+                                    <input type="radio" class="btn-check" name="defaultDuration" id="defaultDuration30" autocomplete="off" checked>
+                                    <label class="btn btn-outline-success" for="defaultDuration30">30 min</label>
+
+                                    <input type="radio" class="btn-check" name="defaultDuration" id="defaultDuration45" autocomplete="off">
+                                    <label class="btn btn-outline-success" for="defaultDuration45">45 min</label>
+
+                                    <input type="radio" class="btn-check" name="defaultDuration" id="defaultDuration60" autocomplete="off">
+                                    <label class="btn btn-outline-success" for="defaultDuration60">1 h</label>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Buffer Time Between Appointments</label>
+                                <select class="form-select">
+                                                    <option value="0">No buffer time</option>
+                                                    <option value="5">5 minutes</option>
+                                                    <option value="10" selected>10 minutes</option>
+                                                    <option value="15">15 minutes</option>
+                                                    <option value="20">20 minutes</option>
+                                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Advance Booking Window</label>
+                                <select class="form-select">
+                                                    <option value="1">1 month</option>
+                                                    <option value="2">2 months</option>
+                                                    <option value="3" selected>3 months</option>
+                                                    <option value="6">6 months</option>
+                                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Appointment Reminders</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="emailReminder" checked>
+                                    <label class="form-check-label" for="emailReminder">
+                                                        Email reminder
+                                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="smsReminder" checked>
+                                    <label class="form-check-label" for="smsReminder">
+                                                        SMS reminder
+                                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Reminder Timing</label>
+                                <select class="form-select">
+                                                    <option value="1">1 hour before</option>
+                                                    <option value="3">3 hours before</option>
+                                                    <option value="12">12 hours before</option>
+                                                    <option value="24" selected>24 hours before</option>
+                                                    <option value="48">48 hours before</option>
+                                                </select>
+                            </div>
+
+                            <div class="d-grid mt-4">
+                                <button type="submit" class="btn btn-success">Save Settings</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Feedback System Settings</h5>
+                    </div>
+                    <div class="card-body">
+                        <form>
+                            <div class="mb-3">
+                                <label class="form-label">Automatically Request Feedback</label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="autoRequestFeedback" checked>
+                                    <label class="form-check-label" for="autoRequestFeedback">Send feedback request after appointment</label>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">When to Send Feedback Request</label>
+                                <select class="form-select">
+                                                    <option value="0">Immediately after appointment</option>
+                                                    <option value="1" selected>1 hour after appointment</option>
+                                                    <option value="3">3 hours after appointment</option>
+                                                    <option value="24">24 hours after appointment</option>
+                                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Feedback Reminder</label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="feedbackReminder" checked>
+                                    <label class="form-check-label" for="feedbackReminder">Send reminder if feedback not provided</label>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Feedback Privacy Settings</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="feedbackPrivacy" id="feedbackPrivate" checked>
+                                    <label class="form-check-label" for="feedbackPrivate">
+                                                        Keep feedback private (internal use only)
+                                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="feedbackPrivacy" id="feedbackAnonymized">
+                                    <label class="form-check-label" for="feedbackAnonymized">
+                                                        Allow anonymized feedback to be shared
+                                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="d-grid mt-4">
+                                <button type="submit" class="btn btn-success">Save Settings</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Working Hours</h5>
+                    </div>
+                    <div class="card-body">
+                        <form>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label class="form-label mb-0">Monday</label>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="mondayActive" checked>
+                                    </div>
+                                </div>
+                                <div class="input-group">
+                                    <input type="time" class="form-control" value="09:00">
+                                    <span class="input-group-text">to</span>
+                                    <input type="time" class="form-control" value="17:00">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label class="form-label mb-0">Tuesday</label>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="tuesdayActive" checked>
+                                    </div>
+                                </div>
+                                <div class="input-group">
+                                    <input type="time" class="form-control" value="09:00">
+                                    <span class="input-group-text">to</span>
+                                    <input type="time" class="form-control" value="17:00">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label class="form-label mb-0">Wednesday</label>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="wednesdayActive" checked>
+                                    </div>
+                                </div>
+                                <div class="input-group">
+                                    <input type="time" class="form-control" value="09:00">
+                                    <span class="input-group-text">to</span>
+                                    <input type="time" class="form-control" value="17:00">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label class="form-label mb-0">Thursday</label>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="thursdayActive" checked>
+                                    </div>
+                                </div>
+                                <div class="input-group">
+                                    <input type="time" class="form-control" value="09:00">
+                                    <span class="input-group-text">to</span>
+                                    <input type="time" class="form-control" value="17:00">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label class="form-label mb-0">Friday</label>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="fridayActive" checked>
+                                    </div>
+                                </div>
+                                <div class="input-group">
+                                    <input type="time" class="form-control" value="09:00">
+                                    <span class="input-group-text">to</span>
+                                    <input type="time" class="form-control" value="17:00">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label class="form-label mb-0">Saturday</label>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="saturdayActive">
+                                    </div>
+                                </div>
+                                <div class="input-group">
+                                    <input type="time" class="form-control" value="10:00" disabled>
+                                    <span class="input-group-text">to</span>
+                                    <input type="time" class="form-control" value="15:00" disabled>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label class="form-label mb-0">Sunday</label>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="sundayActive">
+                                    </div>
+                                </div>
+                                <div class="input-group">
+                                    <input type="time" class="form-control" value="10:00" disabled>
+                                    <span class="input-group-text">to</span>
+                                    <input type="time" class="form-control" value="15:00" disabled>
+                                </div>
+                            </div>
+
+                            <div class="d-grid mt-4">
+                                <button type="submit" class="btn btn-success">Save Working Hours</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+
+    <!-- Calendar Modal -->
+    <div class="modal fade" id="calendarModal" tabindex="-1" aria-labelledby="calendarModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-calendar">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="calendarModalLabel">Select Appointment Date</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="calendar-container">
+                        <div class="calendar-header">
+                            <button class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+                            <h5 class="mb-0">June 2023</h5>
+                            <button class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                        <div class="calendar-days">
+                            <div class="day-name">Sun</div>
+                            <div class="day-name">Mon</div>
+                            <div class="day-name">Tue</div>
+                            <div class="day-name">Wed</div>
+                            <div class="day-name">Thu</div>
+                            <div class="day-name">Fri</div>
+                            <div class="day-name">Sat</div>
+
+                            <div class="day text-muted">28</div>
+                            <div class="day text-muted">29</div>
+                            <div class="day text-muted">30</div>
+                            <div class="day text-muted">31</div>
+                            <div class="day">1</div>
+                            <div class="day">2</div>
+                            <div class="day">3</div>
+
+                            <div class="day">4</div>
+                            <div class="day">5</div>
+                            <div class="day">6</div>
+                            <div class="day">7</div>
+                            <div class="day has-appointment">8</div>
+                            <div class="day">9</div>
+                            <div class="day">10</div>
+
+                            <div class="day">11</div>
+                            <div class="day has-appointment">12</div>
+                            <div class="day">13</div>
+                            <div class="day has-appointment">14</div>
+                            <div class="day">15</div>
+                            <div class="day">16</div>
+                            <div class="day">17</div>
+
+                            <div class="day">18</div>
+                            <div class="day">19</div>
+                            <div class="day">20</div>
+                            <div class="day">21</div>
+                            <div class="day">22</div>
+                            <div class="day">23</div>
+                            <div class="day">24</div>
+
+                            <div class="day">25</div>
+                            <div class="day">26</div>
+                            <div class="day">27</div>
+                            <div class="day">28</div>
+                            <div class="day">29</div>
+                            <div class="day">30</div>
+                            <div class="day text-muted">1</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success" id="select-date-btn">Select Date</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div class="modal fade auth-modal" id="authModal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <ul class="nav nav-tabs" id="authTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="login-tab" data-bs-toggle="tab" data-bs-target="#login" type="button" role="tab" aria-controls="login" aria-selected="true">Login</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="signup-tab" data-bs-toggle="tab" data-bs-target="#signup" type="button" role="tab" aria-controls="signup" aria-selected="false">Sign Up</button>
+                    </li>
+                </ul>
+                <div class="tab-content" id="authTabsContent">
+                    <div class="tab-pane fade show active" id="login" role="tabpanel" aria-labelledby="login-tab">
+                        <div class="tab-content">
+                            <form id="loginForm">
+                                <div class="form-floating mb-3">
+                                    <input type="email" class="form-control" id="loginEmail" placeholder="name@example.com" required>
+                                    <label for="loginEmail">Email address</label>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <input type="password" class="form-control" id="loginPassword" placeholder="Password" required>
+                                    <label for="loginPassword">Password</label>
+                                </div>
+                                <div class="forgot-password">
+                                    <a href="#" id="forgotPasswordLink">Forgot password?</a>
+                                </div>
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-success">Login</button>
+                                </div>
+                                <div class="divider">
+                                    <span class="divider-text">or continue with</span>
+                                </div>
+                                <div class="social-login">
+                                    <a href="#" class="social-btn bg-primary"><i class="bi bi-facebook"></i></a>
+                                    <a href="#" class="social-btn bg-danger"><i class="bi bi-google"></i></a>
+                                    <a href="#" class="social-btn bg-info"><i class="bi bi-twitter"></i></a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="signup" role="tabpanel" aria-labelledby="signup-tab">
+                        <div class="tab-content">
+                            <form id="signupForm">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="signupFirstName" placeholder="First Name" required>
+                                            <label for="signupFirstName">First Name</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="signupLastName" placeholder="Last Name" required>
+                                            <label for="signupLastName">Last Name</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <input type="email" class="form-control" id="signupEmail" placeholder="name@example.com" required>
+                                    <label for="signupEmail">Email address</label>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <input type="password" class="form-control" id="signupPassword" placeholder="Password" required>
+                                    <label for="signupPassword">Password</label>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <input type="password" class="form-control" id="signupConfirmPassword" placeholder="Confirm Password" required>
+                                    <label for="signupConfirmPassword">Confirm Password</label>
+                                </div>
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="termsAgreement" required>
+                                    <label class="form-check-label" for="termsAgreement">
+                                        I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                                    </label>
+                                </div>
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-success">Sign Up</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="forgotPasswordModalLabel">Reset Password</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="forgotPasswordForm">
+                        <div class="mb-3">
+                            <label for="forgotPasswordEmail" class="form-label">Email address</label>
+                            <input type="email" class="form-control" id="forgotPasswordEmail" required>
+                            <div class="form-text">We'll send you a link to reset your password.</div>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success">Send Reset Link</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and other scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Sample charts for the dashboard (would use real data in production)
+        document.addEventListener('DOMContentLoaded', function() {
+            // Feedback Chart
+            const feedbackCtx = document.getElementById('feedbackChart');
+            if (feedbackCtx) {
+                new Chart(feedbackCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Positive', 'Neutral', 'Negative'],
+                        datasets: [{
+                            data: [78, 15, 7],
+                            backgroundColor: ['#3a86ff', '#ffbe0b', '#ff006e']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Appointment Chart
+            const appointmentCtx = document.getElementById('appointmentChart');
+            if (appointmentCtx) {
+                new Chart(appointmentCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+                        datasets: [{
+                            label: 'This Week',
+                            data: [42, 35, 48, 53, 47, 28, 15],
+                            borderColor: '#3a86ff',
+                            tension: 0.3,
+                            fill: false
+                        }, {
+                            label: 'Last Week',
+                            data: [38, 32, 45, 49, 44, 25, 12],
+                            borderColor: '#6c757d',
+                            borderDash: [5, 5],
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Number of Appointments'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Department Chart
+            const departmentCtx = document.getElementById('departmentChart');
+            if (departmentCtx) {
+                new Chart(departmentCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['General Medicine', 'Cardiology', 'Dermatology', 'Neurology', 'Pediatrics', 'Orthopedics'],
+                        datasets: [{
+                            data: [35, 18, 12, 15, 20, 10],
+                            backgroundColor: [
+                                '#3a86ff', '#8338ec', '#ff006e', '#ffbe0b', '#20c997', '#6f42c1'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Department selection
+            const departmentCards = document.querySelectorAll('.department-card');
+            departmentCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    // Clear previous selection
+                    departmentCards.forEach(c => c.classList.remove('selected'));
+
+                    // Mark the current selection
+                    this.classList.add('selected');
+
+                    // Get department name
+                    const departmentName = this.querySelector('h5').textContent;
+
+                    // Update department name in the next step
+                    document.getElementById('selected-department-name').textContent = departmentName;
+                    document.getElementById('confirm-department').textContent = departmentName;
+
+                    // Show date & time section
+                    document.getElementById('date-time-section').style.display = 'block';
+
+                    // Update step indicators
+                    document.querySelector('.step:nth-child(1)').classList.add('completed');
+                    document.querySelector('.step:nth-child(1)').classList.remove('active');
+                    document.querySelector('.step:nth-child(2)').classList.add('active');
+
+                    // Scroll to date time section
+                    document.getElementById('date-time-section').scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // Date picker popup
+            const datePickerBtn = document.getElementById('date-picker-btn');
+            const calendarModal = new bootstrap.Modal(document.getElementById('calendarModal'));
+
+            datePickerBtn.addEventListener('click', function() {
+                calendarModal.show();
+            });
+
+            // Calendar day selection
+            const calendarDays = document.querySelectorAll('.calendar-days .day:not(.text-muted)');
+            calendarDays.forEach(day => {
+                day.addEventListener('click', function() {
+                    calendarDays.forEach(d => d.classList.remove('active'));
+                    // Mark selected day
+                    this.classList.add('active');
+
+                    // Enable the select date button
+                    document.getElementById('select-date-btn').removeAttribute('disabled');
+                });
+            });
+
+            // Handle date selection
+            document.getElementById('select-date-btn').addEventListener('click', function() {
+                const selectedDay = document.querySelector('.calendar-days .day.active');
+                if (selectedDay) {
+                    const day = selectedDay.textContent;
+                    const month = document.querySelector('.calendar-header h5').textContent;
+                    const dateText = `${month} ${day}`;
+
+                    // Update the selected date display
+                    document.getElementById('selected-date').textContent = dateText;
+                    document.getElementById('selected-date-display').textContent = dateText;
+
+                    // Show time slots
+                    document.getElementById('time-slots-container').style.display = 'block';
+
+                    // Update confirmation date
+                    document.getElementById('confirm-datetime').textContent = dateText;
+
+                    // Enable the proceed button
+                    document.getElementById('proceed-to-confirmation').removeAttribute('disabled');
+
+                    // Close the modal
+                    calendarModal.hide();
+                }
+            });
+
+            // Time slot selection
+            const timeSlots = document.querySelectorAll('.time-slot');
+            timeSlots.forEach(slot => {
+                if (!slot.classList.contains('booked')) {
+                    slot.addEventListener('click', function() {
+                        timeSlots.forEach(s => {
+                            if (!s.classList.contains('booked')) {
+                                s.classList.remove('active');
+                            }
+                        });
+                        this.classList.add('active');
+
+                        // Update the confirmation time
+                        const currentDateTime = document.getElementById('confirm-datetime').textContent;
+                        const selectedDate = currentDateTime.split(' at ')[0] || currentDateTime;
+                        const selectedTime = this.textContent;
+                        document.getElementById('confirm-datetime').textContent = `${selectedDate} at ${selectedTime}`;
+                    });
+                }
+            });
+
+            // Proceed to confirmation
+            document.getElementById('proceed-to-confirmation').addEventListener('click', function() {
+                document.getElementById('confirmation-section').style.display = 'block';
+
+                // Update duration in confirmation
+                const selectedDuration = document.querySelector('input[name="duration"]:checked + label').textContent.trim();
+                document.getElementById('confirm-duration').textContent = selectedDuration;
+
+                // Update step indicators
+                document.querySelector('.step:nth-child(2)').classList.add('completed');
+                document.querySelector('.step:nth-child(2)').classList.remove('active');
+                document.querySelector('.step:nth-child(3)').classList.add('active');
+
+                // Scroll to confirmation section
+                document.getElementById('confirmation-section').scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+
+            // Back button
+            document.getElementById('back-to-datetime').addEventListener('click', function() {
+                document.getElementById('confirmation-section').style.display = 'none';
+
+                // Update step indicators
+                document.querySelector('.step:nth-child(3)').classList.remove('active');
+                document.querySelector('.step:nth-child(2)').classList.remove('completed');
+                document.querySelector('.step:nth-child(2)').classList.add('active');
+
+                // Scroll to date time section
+                document.getElementById('date-time-section').scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+
+            // Terms checkbox
+            document.getElementById('terms-check').addEventListener('change', function() {
+                if (this.checked) {
+                    document.getElementById('confirm-appointment').removeAttribute('disabled');
+                } else {
+                    document.getElementById('confirm-appointment').setAttribute('disabled', 'disabled');
+                }
+            });
+
+            // Confirm appointment
+            document.getElementById('confirm-appointment').addEventListener('click', function() {
+                // Here you would typically submit the appointment data to the server
+                // For demo purposes, we'll just show a success message
+
+                alert('Appointment successfully booked!');
+
+                // Reset the form and go back to step 1
+                departmentCards.forEach(c => c.classList.remove('selected'));
+                document.getElementById('date-time-section').style.display = 'none';
+                document.getElementById('confirmation-section').style.display = 'none';
+                document.getElementById('selected-date').textContent = 'Select a date';
+                document.getElementById('time-slots-container').style.display = 'none';
+                document.getElementById('terms-check').checked = false;
+
+                // Reset step indicators
+                document.querySelector('.step:nth-child(1)').classList.remove('completed');
+                document.querySelector('.step:nth-child(1)').classList.add('active');
+                document.querySelector('.step:nth-child(2)').classList.remove('active');
+                document.querySelector('.step:nth-child(2)').classList.remove('completed');
+                document.querySelector('.step:nth-child(3)').classList.remove('active');
+
+                // Scroll to top
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+
+            // Rating buttons interactivity
+            const ratingBtns = document.querySelectorAll('.rating-btn');
+            ratingBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    ratingBtns.forEach(b => b.classList.remove('selected'));
+                    this.classList.add('selected');
+                });
+            });
+
+            // Auth modal functionality
+            const authModal = new bootstrap.Modal(document.getElementById('authModal'));
+            const forgotPasswordModal = new bootstrap.Modal(document.getElementById('forgotPasswordModal'));
+
+            // Show forgot password modal
+            document.getElementById('forgotPasswordLink').addEventListener('click', function(e) {
+                e.preventDefault();
+                authModal.hide();
+                forgotPasswordModal.show();
+            });
+
+            // Login form submission
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                // Here you would typically validate and submit the login data
+                alert('Login functionality would be implemented here');
+                authModal.hide();
+            });
+
+            // Signup form submission
+            document.getElementById('signupForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                // Here you would typically validate and submit the signup data
+                alert('Signup functionality would be implemented here');
+                authModal.hide();
+            });
+
+            // Forgot password form submission
+            document.getElementById('forgotPasswordForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                // Here you would typically handle the password reset request
+                alert('Password reset link would be sent to the email');
+                forgotPasswordModal.hide();
+            });
+
+            // Toggle user state (demo purposes)
+            let isLoggedIn = false;
+            const accountLink = document.getElementById('account-link');
+
+            accountLink.addEventListener('click', function(e) {
+                if (!isLoggedIn) {
+                    e.preventDefault();
+                    authModal.show();
+                } else {
+                    // If logged in, this would navigate to account page
+                    // For demo, we'll just show an alert
+                    alert('Account page would be shown here');
+                }
+            });
+
+            // Demo login (for testing)
+            document.querySelector('.btn-success[data-bs-target="#authModal"]').addEventListener('click', function(e) {
+                if (isLoggedIn) {
+                    e.preventDefault();
+                    // Logout functionality
+                    isLoggedIn = false;
+                    this.innerHTML = '<i class="bi bi-person-plus"></i> Login/Signup';
+                    accountLink.innerHTML = '<i class="bi bi-person-circle"></i> Account';
+                    alert('You have been logged out');
+                }
+            });
+
+            // Demo login success
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                isLoggedIn = true;
+                authModal.hide();
+                document.querySelector('.btn-success[data-bs-target="#authModal"]').innerHTML = '<i class="bi bi-box-arrow-right"></i> Logout';
+                accountLink.innerHTML = '<i class="bi bi-person-circle"></i> My Account';
+                alert('Login successful! Welcome back.');
+            });
+        });
+    </script>
+</body>
+
+</html>
