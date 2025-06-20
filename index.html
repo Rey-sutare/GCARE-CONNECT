@@ -21,15 +21,19 @@
             background-color: var(--light-color);
             color: var(--dark-color);
         }
+        /* Sidebar - Collapses on mobile */
         
         .sidebar {
             background: linear-gradient(135deg, var(--dark-color), #16213e);
-            height: 100vh;
             position: fixed;
             left: 0;
             top: 0;
+            bottom: 0;
+            width: 250px;
             padding-top: 20px;
             box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transition: all 0.3s;
         }
         
         .sidebar .nav-link {
@@ -38,6 +42,7 @@
             padding: 12px 20px;
             margin: 5px 10px;
             transition: all 0.3s ease;
+            white-space: nowrap;
         }
         
         .sidebar .nav-link.active {
@@ -55,12 +60,94 @@
             margin-right: 10px;
             font-size: 1.1rem;
         }
+        /* Main content - Adjusts based on sidebar state */
         
         .main-content {
             margin-left: 250px;
             padding: 30px;
             background-color: var(--light-color);
+            transition: all 0.3s;
         }
+        /* Mobile menu toggle */
+        
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1100;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 12px;
+            font-size: 1.2rem;
+        }
+        /* Responsive adjustments */
+        
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+            /* Adjust department cards for tablet */
+            .department-card {
+                margin-bottom: 15px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            /* Stack time slots on mobile */
+            .time-slots {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+            /* Adjust appointment steps */
+            .step-title {
+                font-size: 0.8rem;
+            }
+            /* Make confirmation section full width */
+            .confirmation-section .col-md-6 {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+            /* Adjust feedback rating buttons */
+            .feedback-rating {
+                flex-wrap: wrap;
+            }
+            .rating-btn {
+                flex: 0 0 48%;
+                margin-bottom: 10px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            /* Single column layout for smallest screens */
+            .time-slots {
+                grid-template-columns: 1fr !important;
+            }
+            /* Adjust padding */
+            .main-content {
+                padding: 15px;
+            }
+            /* Smaller text for mobile */
+            h2 {
+                font-size: 1.5rem;
+            }
+            /* Stack dashboard cards */
+            .dashboard-card {
+                margin-bottom: 15px;
+            }
+        }
+        /* Common styles (unchanged from original) */
         
         h2,
         h3,
@@ -96,6 +183,7 @@
             overflow: hidden;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             background-color: white;
+            height: 100%;
         }
         
         .department-card:hover {
@@ -229,10 +317,13 @@
             display: flex;
             margin-bottom: 30px;
             position: relative;
+            overflow-x: auto;
+            padding-bottom: 10px;
         }
         
         .step {
             flex: 1;
+            min-width: 100px;
             text-align: center;
             position: relative;
             padding-bottom: 20px;
@@ -320,6 +411,7 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             transition: transform 0.3s, box-shadow 0.3s;
             overflow: hidden;
+            height: 100%;
         }
         
         .dashboard-card:hover {
@@ -598,12 +690,17 @@
 </head>
 
 <body>
+    <!-- Mobile Menu Button (Hidden on desktop) -->
+    <button class="mobile-menu-btn" id="mobileMenuBtn">
+        <i class="bi bi-list"></i>
+    </button>
+
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
-            <div class="col-md-2 sidebar">
+            <div class="col-md-2 sidebar" id="sidebar">
                 <div class="sidebar-logo">
-                    <h3><span>GCare Connect</h3>
+                    <h3><span>GCare Connect</span></h3>
                     <p class="small text-muted"></p>
                 </div>
                 <ul class="nav flex-column">
@@ -645,7 +742,7 @@
             </div>
 
             <!-- Main Content -->
-            <div class="col-md-10 main-content">
+            <div class="col-md-10 main-content" id="mainContent">
                 <div class="tab-content">
                     <!-- Appointments Tab -->
                     <div class="tab-pane fade show active" id="appointment">
@@ -667,7 +764,7 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-md-8">
+                            <div class="col-lg-8">
                                 <div class="row mb-4">
                                     <div class="col-12">
                                         <div class="card">
@@ -676,7 +773,7 @@
                                             </div>
                                             <div class="card-body">
                                                 <div class="row">
-                                                    <div class="col-md-4">
+                                                    <div class="col-md-4 col-sm-6">
                                                         <div class="card department-card" data-department="general">
                                                             <div class="card-body text-center">
                                                                 <i class="bi bi-clipboard-pulse department-icon"></i>
@@ -688,7 +785,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-4">
+                                                    <div class="col-md-4 col-sm-6">
                                                         <div class="card department-card" data-department="cardiology">
                                                             <div class="card-body text-center">
                                                                 <i class="bi bi-heart-pulse department-icon"></i>
@@ -700,7 +797,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-4">
+                                                    <div class="col-md-4 col-sm-6">
                                                         <div class="card department-card" data-department="dermatology">
                                                             <div class="card-body text-center">
                                                                 <i class="bi bi-bandaid department-icon"></i>
@@ -712,7 +809,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-4">
+                                                    <div class="col-md-4 col-sm-6">
                                                         <div class="card department-card" data-department="neurology">
                                                             <div class="card-body text-center">
                                                                 <i class="bi bi-brain department-icon"></i>
@@ -724,7 +821,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-4">
+                                                    <div class="col-md-4 col-sm-6">
                                                         <div class="card department-card" data-department="pediatrics">
                                                             <div class="card-body text-center">
                                                                 <i class="bi bi-emoji-smile department-icon"></i>
@@ -736,7 +833,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-4">
+                                                    <div class="col-md-4 col-sm-6">
                                                         <div class="card department-card" data-department="orthopedics">
                                                             <div class="card-body text-center">
                                                                 <i class="bi bi-universal-access department-icon"></i>
@@ -759,931 +856,931 @@
                                         <div class="card">
                                             <div class="card-header">
                                                 <h5 class="mb-0"><span id="selected-department-name">General Medicine</span> - Select Date & Time</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <label class="form-label">Select Date</label>
-                            <div class="date-select-btn" id="date-picker-btn">
-                                <span id="selected-date">Select a date</span>
-                                <i class="bi bi-calendar3"></i>
-                            </div>
-                        </div>
-                    </div>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row mb-4">
+                                                    <div class="col-12">
+                                                        <label class="form-label">Select Date</label>
+                                                        <div class="date-select-btn" id="date-picker-btn">
+                                                            <span id="selected-date">Select a date</span>
+                                                            <i class="bi bi-calendar3"></i>
+                                                        </div>
+                                                    </div>
+                                                </div>
 
-                    <div class="row" id="time-slots-container" style="display: none;">
-                        <div class="col-12">
-                            <h6>Available Time Slots for <span id="selected-date-display">June 8, 2023</span></h6>
-                            <div class="time-slots">
-                                <div class="time-slot booked">9:00 AM</div>
-                                <div class="time-slot booked">10:00 AM</div>
-                                <div class="time-slot available">11:00 AM</div>
-                                <div class="time-slot available">12:00 PM</div>
-                                <div class="time-slot booked">1:00 PM</div>
-                                <div class="time-slot available">2:00 PM</div>
-                                <div class="time-slot available">3:00 PM</div>
-                                <div class="time-slot booked">4:30 PM</div>
-                            </div>
-                        </div>
-                    </div>
+                                                <div class="row" id="time-slots-container" style="display: none;">
+                                                    <div class="col-12">
+                                                        <h6>Available Time Slots for <span id="selected-date-display">June 8, 2023</span></h6>
+                                                        <div class="time-slots">
+                                                            <div class="time-slot booked">9:00 AM</div>
+                                                            <div class="time-slot booked">10:00 AM</div>
+                                                            <div class="time-slot available">11:00 AM</div>
+                                                            <div class="time-slot available">12:00 PM</div>
+                                                            <div class="time-slot booked">1:00 PM</div>
+                                                            <div class="time-slot available">2:00 PM</div>
+                                                            <div class="time-slot available">3:00 PM</div>
+                                                            <div class="time-slot booked">4:30 PM</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
 
-                    <div class="row mt-4">
-                        <div class="col-12">
-                            <h6>Appointment Duration</h6>
-                            <div class="btn-group w-100" role="group">
-                                <input type="radio" class="btn-check" name="duration" id="duration15" autocomplete="off">
-                                <label class="btn btn-outline-success" for="duration15">15 min</label>
+                                                <div class="row mt-4">
+                                                    <div class="col-12">
+                                                        <h6>Appointment Duration</h6>
+                                                        <div class="btn-group w-100" role="group">
+                                                            <input type="radio" class="btn-check" name="duration" id="duration15" autocomplete="off">
+                                                            <label class="btn btn-outline-success" for="duration15">15 min</label>
 
-                                <input type="radio" class="btn-check" name="duration" id="duration30" autocomplete="off">
-                                <label class="btn btn-outline-success" for="duration30">30 min</label>
+                                                            <input type="radio" class="btn-check" name="duration" id="duration30" autocomplete="off">
+                                                            <label class="btn btn-outline-success" for="duration30">30 min</label>
 
-                                <input type="radio" class="btn-check" name="duration" id="duration45" autocomplete="off">
-                                <label class="btn btn-outline-success" for="duration45">45 min</label>
+                                                            <input type="radio" class="btn-check" name="duration" id="duration45" autocomplete="off">
+                                                            <label class="btn btn-outline-success" for="duration45">45 min</label>
 
-                                <input type="radio" class="btn-check" name="duration" id="duration60" autocomplete="off" checked>
-                                <label class="btn btn-outline-success" for="duration60">1 h</label>
-                            </div>
-                        </div>
-                    </div>
+                                                            <input type="radio" class="btn-check" name="duration" id="duration60" autocomplete="off" checked>
+                                                            <label class="btn btn-outline-success" for="duration60">1 h</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
 
-                    <div class="d-grid mt-4">
-                        <button class="btn btn-success" id="proceed-to-confirmation" disabled>Proceed to Confirmation</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+                                                <div class="d-grid mt-4">
+                                                    <button class="btn btn-success" id="proceed-to-confirmation" disabled>Proceed to Confirmation</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
-    <div class="row" id="confirmation-section" style="display: none;">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Confirm Appointment Details</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h6>Department</h6>
-                            <p id="confirm-department">General Medicine</p>
+                                <div class="row" id="confirmation-section" style="display: none;">
+                                    <div class="col-12">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="mb-0">Confirm Appointment Details</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <h6>Department</h6>
+                                                        <p id="confirm-department">General Medicine</p>
 
-                            <h6>Date & Time</h6>
-                            <p id="confirm-datetime">June 8, 2023 at 3:00 PM</p>
+                                                        <h6>Date & Time</h6>
+                                                        <p id="confirm-datetime">June 8, 2023 at 3:00 PM</p>
 
-                            <h6>Duration</h6>
-                            <p id="confirm-duration">1 hour</p>
-                        </div>
+                                                        <h6>Duration</h6>
+                                                        <p id="confirm-duration">1 hour</p>
+                                                    </div>
 
-                        <div class="col-md-6">
-                            <h6>Doctor</h6>
-                            <select class="form-select mb-3">
+                                                    <div class="col-md-6">
+                                                        <h6>Doctor</h6>
+                                                        <select class="form-select mb-3">
                                                             <option selected>Dr. Sarah Johnson</option>
                                                             <option>Dr. Michael Chen</option>
                                                             <option>Dr. Emily Rodriguez</option>
                                                         </select>
 
-                            <h6>Appointment Type</h6>
-                            <select class="form-select mb-3">
+                                                        <h6>Appointment Type</h6>
+                                                        <select class="form-select mb-3">
                                                             <option selected>In-person</option>
                                                             <option>Video Consultation</option>
                                                             <option>Phone Consultation</option>
                                                         </select>
 
-                            <h6>Reason for Visit</h6>
-                            <textarea class="form-control" rows="3" placeholder="Briefly describe your reason for the appointment"></textarea>
-                        </div>
-                    </div>
+                                                        <h6>Reason for Visit</h6>
+                                                        <textarea class="form-control" rows="3" placeholder="Briefly describe your reason for the appointment"></textarea>
+                                                    </div>
+                                                </div>
 
-                    <div class="row mt-4">
-                        <div class="col-12">
-                            <div class="form-check mb-3">
-                                <input class="form-check-input" type="checkbox" id="terms-check">
-                                <label class="form-check-label" for="terms-check">
+                                                <div class="row mt-4">
+                                                    <div class="col-12">
+                                                        <div class="form-check mb-3">
+                                                            <input class="form-check-input" type="checkbox" id="terms-check">
+                                                            <label class="form-check-label" for="terms-check">
                                                                 I agree to the appointment policies and cancellation terms
                                                             </label>
-                            </div>
+                                                        </div>
 
-                            <div class="d-flex justify-content-between">
-                                <button class="btn btn-outline-secondary" id="back-to-datetime">Back</button>
-                                <button class="btn btn-success" id="confirm-appointment" disabled>Confirm Appointment</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    </div>
-
-    <div class="col-md-4">
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5 class="mb-0">Ongoing Appointments</h5>
-            </div>
-            <div class="card-body">
-                <div class="card appointment-card ongoing mb-3">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h6 class="mb-0">Video Conference</h6>
-                            <span class="badge bg-danger">Now</span>
-                        </div>
-                        <p class="text-muted small mb-2">Thursday, June 8, 2023</p>
-                        <p class="text-muted small mb-2">4:30 PM - 5:00 PM</p>
-                        <p class="text-muted small mb-0">Department: General Medicine</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Upcoming Appointments</h5>
-            </div>
-            <div class="card-body">
-                <div class="card appointment-card mb-3">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h6 class="mb-0">Dr. Sarah Johnson</h6>
-                            <span class="badge bg-success">Confirmed</span>
-                        </div>
-                        <p class="text-muted small mb-2">Monday, June 12, 2023</p>
-                        <p class="text-muted small mb-2">10:00 AM - 10:30 AM</p>
-                        <p class="text-muted small mb-2">Department: Cardiology</p>
-                        <div class="d-flex mt-2">
-                            <button class="btn btn-sm btn-outline-secondary me-2">Reschedule</button>
-                            <button class="btn btn-sm btn-outline-danger">Cancel</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    </div>
-    </div>
-
-    <!-- Feedback Tab -->
-    <div class="tab-pane fade" id="feedback">
-        <h2 class="mb-4">Patient Feedback System</h2>
-
-        <div class="row">
-            <div class="col-md-8">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">Provide Feedback for Your Recent Appointment</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <h6>Recent Appointment: Video Conference with Dr. Steven</h6>
-                            <p class="text-muted">Thursday, June 8, 2023, 4:30 PM - 5:00 PM</p>
-                        </div>
-
-                        <div class="mb-3">
-                            <h6>How would you rate your overall experience?</h6>
-                            <div class="feedback-rating">
-                                <div class="rating-btn" data-rating="1">
-                                    <i class="bi bi-emoji-frown fs-3 d-block"></i> Poor
-                                </div>
-                                <div class="rating-btn" data-rating="2">
-                                    <i class="bi bi-emoji-neutral fs-3 d-block"></i> Fair
-                                </div>
-                                <div class="rating-btn selected" data-rating="3">
-                                    <i class="bi bi-emoji-smile fs-3 d-block"></i> Good
-                                </div>
-                                <div class="rating-btn" data-rating="4">
-                                    <i class="bi bi-emoji-laughing fs-3 d-block"></i> Excellent
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="feedbackText" class="form-label">Please share your feedback:</label>
-                            <textarea class="form-control" id="feedbackText" rows="5" placeholder="Tell us about your experience...">The doctor was very attentive and explained everything clearly. The appointment scheduling was convenient and the video call worked without any issues.</textarea>
-                        </div>
-
-                        <div class="mb-3">
-                            <h6>Would you recommend our services to others?</h6>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="recommend" id="recommendYes" checked>
-                                <label class="form-check-label" for="recommendYes">Yes</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="recommend" id="recommendNo">
-                                <label class="form-check-label" for="recommendNo">No</label>
-                            </div>
-                        </div>
-
-                        <div class="d-grid">
-                            <button class="btn btn-success">Submit Feedback</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">Your Previous Feedback</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-4 pb-4 border-bottom">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <h6>Appointment with Dr. Sarah Johnson (Cardiology)</h6>
-                                <span class="badge bg-success">Positive</span>
-                            </div>
-                            <p class="text-muted small">May 15, 2023</p>
-                            <p>"Dr. Johnson was very thorough and knowledgeable. She took the time to explain my condition and treatment options. The staff was courteous and the facility was clean."</p>
-                            <div class="d-flex align-items-center">
-                                <span class="me-2">Rating:</span>
-                                <i class="bi bi-star-fill text-warning"></i>
-                                <i class="bi bi-star-fill text-warning"></i>
-                                <i class="bi bi-star-fill text-warning"></i>
-                                <i class="bi bi-star-fill text-warning"></i>
-                                <i class="bi bi-star text-warning"></i>
-                            </div>
-                        </div>
-
-                        <div>
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <h6>Appointment with Dr. Michael Chen (Neurology)</h6>
-                                <span class="badge bg-warning text-dark">Neutral</span>
-                            </div>
-                            <p class="text-muted small">April 28, 2023</p>
-                            <p>"The doctor was professional, but I had to wait for 30 minutes past my scheduled appointment time. The reception area was a bit crowded."</p>
-                            <div class="d-flex align-items-center">
-                                <span class="me-2">Rating:</span>
-                                <i class="bi bi-star-fill text-warning"></i>
-                                <i class="bi bi-star-fill text-warning"></i>
-                                <i class="bi bi-star-fill text-warning"></i>
-                                <i class="bi bi-star text-warning"></i>
-                                <i class="bi bi-star text-warning"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">Feedback Analytics</h5>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="feedbackChart" width="100%" height="250"></canvas>
-                        <div class="mt-3">
-                            <div class="d-flex justify-content-between mb-2">
-                                <span>Positive Feedback</span>
-                                <span class="fw-bold">78%</span>
-                            </div>
-                            <div class="progress mb-3">
-                                <div class="progress-bar bg-success" role="progressbar" style="width: 78%"></div>
-                            </div>
-
-                            <div class="d-flex justify-content-between mb-2">
-                                <span>Neutral Feedback</span>
-                                <span class="fw-bold">15%</span>
-                            </div>
-                            <div class="progress mb-3">
-                                <div class="progress-bar bg-warning" role="progressbar" style="width: 15%"></div>
-                            </div>
-
-                            <div class="d-flex justify-content-between mb-2">
-                                <span>Negative Feedback</span>
-                                <span class="fw-bold">7%</span>
-                            </div>
-                            <div class="progress">
-                                <div class="progress-bar bg-danger" role="progressbar" style="width: 7%"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">Common Feedback Topics</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <h6 class="text-success">Positive Mentions</h6>
-                            <div class="d-flex mb-2">
-                                <span class="badge bg-success me-2">Staff Friendliness</span>
-                                <span class="small text-muted">42 mentions</span>
-                            </div>
-                            <div class="d-flex mb-2">
-                                <span class="badge bg-success me-2">Doctor Knowledge</span>
-                                <span class="small text-muted">38 mentions</span>
-                            </div>
-                            <div class="d-flex">
-                                <span class="badge bg-success me-2">Appointment Ease</span>
-                                <span class="small text-muted">25 mentions</span>
-                            </div>
-                        </div>
-
-                        <div>
-                            <h6 class="text-danger">Areas for Improvement</h6>
-                            <div class="d-flex mb-2">
-                                <span class="badge bg-danger me-2">Wait Times</span>
-                                <span class="small text-muted">18 mentions</span>
-                            </div>
-                            <div class="d-flex mb-2">
-                                <span class="badge bg-danger me-2">Parking</span>
-                                <span class="small text-muted">12 mentions</span>
-                            </div>
-                            <div class="d-flex">
-                                <span class="badge bg-danger me-2">Follow-up Communication</span>
-                                <span class="small text-muted">7 mentions</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Dashboard Tab -->
-    <div class="tab-pane fade" id="dashboard">
-        <h2 class="mb-4">Business Analytics Dashboard</h2>
-
-        <div class="row">
-            <div class="col-md-3 mb-4">
-                <div class="card dashboard-card stats-card">
-                    <div class="card-body">
-                        <h5 class="card-title">Total Appointments</h5>
-                        <h1 class="display-4 mb-0">1,257</h1>
-                        <p class="card-text mt-3">
-                            <i class="bi bi-arrow-up"></i> 12% increase from last month
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-3 mb-4">
-                <div class="card dashboard-card stats-card">
-                    <div class="card-body">
-                        <h5 class="card-title">Patient Satisfaction</h5>
-                        <h1 class="display-4 mb-0">87%</h1>
-                        <p class="card-text mt-3">
-                            <i class="bi bi-arrow-up"></i> 5% increase from last quarter
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-3 mb-4">
-                <div class="card dashboard-card stats-card">
-                    <div class="card-body">
-                        <h5 class="card-title">Cancellation Rate</h5>
-                        <h1 class="display-4 mb-0">8.3%</h1>
-                        <p class="card-text mt-3">
-                            <i class="bi bi-arrow-down"></i> 2.1% decrease from last month
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-3 mb-4">
-                <div class="card dashboard-card stats-card">
-                    <div class="card-body">
-                        <h5 class="card-title">Average Wait Time</h5>
-                        <h1 class="display-4 mb-0">12<small>min</small></h1>
-                        <p class="card-text mt-3">
-                            <i class="bi bi-arrow-down"></i> 3 min decrease from last quarter
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-8 mb-4">
-                <div class="card dashboard-card">
-                    <div class="card-header bg-white border-0">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">Appointment Trends</h5>
-                            <div class="btn-group btn-group-sm">
-                                <button class="btn btn-outline-secondary active">Week</button>
-                                <button class="btn btn-outline-secondary">Month</button>
-                                <button class="btn btn-outline-secondary">Year</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="appointmentChart" width="100%" height="300"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4 mb-4">
-                <div class="card dashboard-card">
-                    <div class="card-header bg-white border-0">
-                        <h5 class="mb-0">Appointments by Department</h5>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="departmentChart" width="100%" height="300"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-6 mb-4">
-                <div class="card dashboard-card">
-                    <div class="card-header bg-white border-0">
-                        <h5 class="mb-0">Resource Utilization</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-4">
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>General Medicine</span>
-                                <span>92% utilized</span>
-                            </div>
-                            <div class="progress">
-                                <div class="progress-bar bg-success" role="progressbar" style="width: 92%"></div>
-                            </div>
-                        </div>
-
-                        <div class="mb-4">
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>Cardiology</span>
-                                <span>78% utilized</span>
-                            </div>
-                            <div class="progress">
-                                <div class="progress-bar bg-success" role="progressbar" style="width: 78%"></div>
-                            </div>
-                        </div>
-
-                        <div class="mb-4">
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>Dermatology</span>
-                                <span>65% utilized</span>
-                            </div>
-                            <div class="progress">
-                                <div class="progress-bar bg-success" role="progressbar" style="width: 65%"></div>
-                            </div>
-                        </div>
-
-                        <div class="mb-4">
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>Neurology</span>
-                                <span>83% utilized</span>
-                            </div>
-                            <div class="progress">
-                                <div class="progress-bar bg-success" role="progressbar" style="width: 83%"></div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>Pediatrics</span>
-                                <span>71% utilized</span>
-                            </div>
-                            <div class="progress">
-                                <div class="progress-bar bg-success" role="progressbar" style="width: 71%"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-6 mb-4">
-                <div class="card dashboard-card">
-                    <div class="card-header bg-white border-0">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">Recent Feedback Analysis</h5>
-                            <button class="btn btn-sm btn-outline-success">Generate Report</button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Department</th>
-                                        <th>Feedback Score</th>
-                                        <th>Sentiment</th>
-                                        <th>Trend</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>General Medicine</td>
-                                        <td>4.2/5</td>
-                                        <td><span class="badge bg-success">Positive</span></td>
-                                        <td><i class="bi bi-arrow-up text-success"></i></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Cardiology</td>
-                                        <td>4.5/5</td>
-                                        <td><span class="badge bg-success">Positive</span></td>
-                                        <td><i class="bi bi-arrow-up text-success"></i></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Dermatology</td>
-                                        <td>3.8/5</td>
-                                        <td><span class="badge bg-warning text-dark">Neutral</span></td>
-                                        <td><i class="bi bi-dash text-warning"></i></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Neurology</td>
-                                        <td>4.1/5</td>
-                                        <td><span class="badge bg-success">Positive</span></td>
-                                        <td><i class="bi bi-arrow-up text-success"></i></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Pediatrics</td>
-                                        <td>4.7/5</td>
-                                        <td><span class="badge bg-success">Positive</span></td>
-                                        <td><i class="bi bi-arrow-up text-success"></i></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Departments Tab -->
-    <div class="tab-pane fade" id="departments">
-        <h2 class="mb-4">Departments</h2>
-
-        <div class="row">
-            <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h4 class="card-title text-success">General Medicine</h4>
-                        <p class="card-text">Primary healthcare services for adults, managing various conditions and providing preventive care.</p>
-                        <ul class="list-group list-group-flush mb-3">
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Available Doctors
-                                <span class="badge bg-success rounded-pill">8</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Available Time Slots
-                                <span class="badge bg-success rounded-pill">42</span>
-                            </li>
-                        </ul>
-                        <a href="#" class="btn btn-outline-success">Schedule Appointment</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h4 class="card-title text-success">Cardiology</h4>
-                        <p class="card-text">Specialized care for heart and cardiovascular conditions, including diagnostics and treatments.</p>
-                        <ul class="list-group list-group-flush mb-3">
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Available Doctors
-                                <span class="badge bg-success rounded-pill">5</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Available Time Slots
-                                <span class="badge bg-success rounded-pill">28</span>
-                            </li>
-                        </ul>
-                        <a href="#" class="btn btn-outline-success">Schedule Appointment</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h4 class="card-title text-success">Dermatology</h4>
-                        <p class="card-text">Diagnosis and treatment of skin, hair, and nail conditions for patients of all ages.</p>
-                        <ul class="list-group list-group-flush mb-3">
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Available Doctors
-                                <span class="badge bg-success rounded-pill">4</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Available Time Slots
-                                <span class="badge bg-success rounded-pill">22</span>
-                            </li>
-                        </ul>
-                        <a href="#" class="btn btn-outline-success">Schedule Appointment</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h4 class="card-title text-success">Neurology</h4>
-                        <p class="card-text">Medical specialty dealing with disorders of the nervous system, including brain and spinal cord.</p>
-                        <ul class="list-group list-group-flush mb-3">
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Available Doctors
-                                <span class="badge bg-success rounded-pill">3</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Available Time Slots
-                                <span class="badge bg-success rounded-pill">18</span>
-                            </li>
-                        </ul>
-                        <a href="#" class="btn btn-outline-success">Schedule Appointment</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h4 class="card-title text-success">Pediatrics</h4>
-                        <p class="card-text">Specialized healthcare for infants, children, and adolescents up to 18 years of age.</p>
-                        <ul class="list-group list-group-flush mb-3">
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Available Doctors
-                                <span class="badge bg-success rounded-pill">6</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Available Time Slots
-                                <span class="badge bg-success rounded-pill">35</span>
-                            </li>
-                        </ul>
-                        <a href="#" class="btn btn-outline-success">Schedule Appointment</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h4 class="card-title text-success">Orthopedics</h4>
-                        <p class="card-text">Treats conditions involving the musculoskeletal system, including bones, joints, and muscles.</p>
-                        <ul class="list-group list-group-flush mb-3">
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Available Doctors
-                                <span class="badge bg-success rounded-pill">4</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Available Time Slots
-                                <span class="badge bg-success rounded-pill">26</span>
-                            </li>
-                        </ul>
-                        <a href="#" class="btn btn-outline-success">Schedule Appointment</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Settings Tab -->
-    <div class="tab-pane fade" id="settings">
-        <h2 class="mb-4">Settings</h2>
-
-        <div class="row">
-            <div class="col-md-8">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">Appointment Settings</h5>
-                    </div>
-                    <div class="card-body">
-                        <form>
-                            <div class="mb-3">
-                                <label class="form-label">Default Appointment Duration</label>
-                                <div class="btn-group w-100" role="group">
-                                    <input type="radio" class="btn-check" name="defaultDuration" id="defaultDuration15" autocomplete="off">
-                                    <label class="btn btn-outline-success" for="defaultDuration15">15 min</label>
-
-                                    <input type="radio" class="btn-check" name="defaultDuration" id="defaultDuration30" autocomplete="off" checked>
-                                    <label class="btn btn-outline-success" for="defaultDuration30">30 min</label>
-
-                                    <input type="radio" class="btn-check" name="defaultDuration" id="defaultDuration45" autocomplete="off">
-                                    <label class="btn btn-outline-success" for="defaultDuration45">45 min</label>
-
-                                    <input type="radio" class="btn-check" name="defaultDuration" id="defaultDuration60" autocomplete="off">
-                                    <label class="btn btn-outline-success" for="defaultDuration60">1 h</label>
+                                                        <div class="d-flex justify-content-between">
+                                                            <button class="btn btn-outline-secondary" id="back-to-datetime">Back</button>
+                                                            <button class="btn btn-success" id="confirm-appointment" disabled>Confirm Appointment</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="mb-3">
-                                <label class="form-label">Buffer Time Between Appointments</label>
-                                <select class="form-select">
+                            <div class="col-lg-4">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Ongoing Appointments</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="card appointment-card ongoing mb-3">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <h6 class="mb-0">Video Conference</h6>
+                                                    <span class="badge bg-danger">Now</span>
+                                                </div>
+                                                <p class="text-muted small mb-2">Thursday, June 8, 2023</p>
+                                                <p class="text-muted small mb-2">4:30 PM - 5:00 PM</p>
+                                                <p class="text-muted small mb-0">Department: General Medicine</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Upcoming Appointments</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="card appointment-card mb-3">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <h6 class="mb-0">Dr. Sarah Johnson</h6>
+                                                    <span class="badge bg-success">Confirmed</span>
+                                                </div>
+                                                <p class="text-muted small mb-2">Monday, June 12, 2023</p>
+                                                <p class="text-muted small mb-2">10:00 AM - 10:30 AM</p>
+                                                <p class="text-muted small mb-2">Department: Cardiology</p>
+                                                <div class="d-flex mt-2">
+                                                    <button class="btn btn-sm btn-outline-secondary me-2">Reschedule</button>
+                                                    <button class="btn btn-sm btn-outline-danger">Cancel</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Feedback Tab -->
+                    <div class="tab-pane fade" id="feedback">
+                        <h2 class="mb-4">Patient Feedback System</h2>
+
+                        <div class="row">
+                            <div class="col-lg-8">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Provide Feedback for Your Recent Appointment</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <h6>Recent Appointment: Video Conference with Dr. Steven</h6>
+                                            <p class="text-muted">Thursday, June 8, 2023, 4:30 PM - 5:00 PM</p>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <h6>How would you rate your overall experience?</h6>
+                                            <div class="feedback-rating">
+                                                <div class="rating-btn" data-rating="1">
+                                                    <i class="bi bi-emoji-frown fs-3 d-block"></i> Poor
+                                                </div>
+                                                <div class="rating-btn" data-rating="2">
+                                                    <i class="bi bi-emoji-neutral fs-3 d-block"></i> Fair
+                                                </div>
+                                                <div class="rating-btn selected" data-rating="3">
+                                                    <i class="bi bi-emoji-smile fs-3 d-block"></i> Good
+                                                </div>
+                                                <div class="rating-btn" data-rating="4">
+                                                    <i class="bi bi-emoji-laughing fs-3 d-block"></i> Excellent
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="feedbackText" class="form-label">Please share your feedback:</label>
+                                            <textarea class="form-control" id="feedbackText" rows="5" placeholder="Tell us about your experience...">The doctor was very attentive and explained everything clearly. The appointment scheduling was convenient and the video call worked without any issues.</textarea>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <h6>Would you recommend our services to others?</h6>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="recommend" id="recommendYes" checked>
+                                                <label class="form-check-label" for="recommendYes">Yes</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="recommend" id="recommendNo">
+                                                <label class="form-check-label" for="recommendNo">No</label>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-grid">
+                                            <button class="btn btn-success">Submit Feedback</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Your Previous Feedback</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-4 pb-4 border-bottom">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <h6>Appointment with Dr. Sarah Johnson (Cardiology)</h6>
+                                                <span class="badge bg-success">Positive</span>
+                                            </div>
+                                            <p class="text-muted small">May 15, 2023</p>
+                                            <p>"Dr. Johnson was very thorough and knowledgeable. She took the time to explain my condition and treatment options. The staff was courteous and the facility was clean."</p>
+                                            <div class="d-flex align-items-center">
+                                                <span class="me-2">Rating:</span>
+                                                <i class="bi bi-star-fill text-warning"></i>
+                                                <i class="bi bi-star-fill text-warning"></i>
+                                                <i class="bi bi-star-fill text-warning"></i>
+                                                <i class="bi bi-star-fill text-warning"></i>
+                                                <i class="bi bi-star text-warning"></i>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <h6>Appointment with Dr. Michael Chen (Neurology)</h6>
+                                                <span class="badge bg-warning text-dark">Neutral</span>
+                                            </div>
+                                            <p class="text-muted small">April 28, 2023</p>
+                                            <p>"The doctor was professional, but I had to wait for 30 minutes past my scheduled appointment time. The reception area was a bit crowded."</p>
+                                            <div class="d-flex align-items-center">
+                                                <span class="me-2">Rating:</span>
+                                                <i class="bi bi-star-fill text-warning"></i>
+                                                <i class="bi bi-star-fill text-warning"></i>
+                                                <i class="bi bi-star-fill text-warning"></i>
+                                                <i class="bi bi-star text-warning"></i>
+                                                <i class="bi bi-star text-warning"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Feedback Analytics</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas id="feedbackChart" width="100%" height="250"></canvas>
+                                        <div class="mt-3">
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span>Positive Feedback</span>
+                                                <span class="fw-bold">78%</span>
+                                            </div>
+                                            <div class="progress mb-3">
+                                                <div class="progress-bar bg-success" role="progressbar" style="width: 78%"></div>
+                                            </div>
+
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span>Neutral Feedback</span>
+                                                <span class="fw-bold">15%</span>
+                                            </div>
+                                            <div class="progress mb-3">
+                                                <div class="progress-bar bg-warning" role="progressbar" style="width: 15%"></div>
+                                            </div>
+
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span>Negative Feedback</span>
+                                                <span class="fw-bold">7%</span>
+                                            </div>
+                                            <div class="progress">
+                                                <div class="progress-bar bg-danger" role="progressbar" style="width: 7%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Common Feedback Topics</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <h6 class="text-success">Positive Mentions</h6>
+                                            <div class="d-flex mb-2">
+                                                <span class="badge bg-success me-2">Staff Friendliness</span>
+                                                <span class="small text-muted">42 mentions</span>
+                                            </div>
+                                            <div class="d-flex mb-2">
+                                                <span class="badge bg-success me-2">Doctor Knowledge</span>
+                                                <span class="small text-muted">38 mentions</span>
+                                            </div>
+                                            <div class="d-flex">
+                                                <span class="badge bg-success me-2">Appointment Ease</span>
+                                                <span class="small text-muted">25 mentions</span>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <h6 class="text-danger">Areas for Improvement</h6>
+                                            <div class="d-flex mb-2">
+                                                <span class="badge bg-danger me-2">Wait Times</span>
+                                                <span class="small text-muted">18 mentions</span>
+                                            </div>
+                                            <div class="d-flex mb-2">
+                                                <span class="badge bg-danger me-2">Parking</span>
+                                                <span class="small text-muted">12 mentions</span>
+                                            </div>
+                                            <div class="d-flex">
+                                                <span class="badge bg-danger me-2">Follow-up Communication</span>
+                                                <span class="small text-muted">7 mentions</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dashboard Tab -->
+                    <div class="tab-pane fade" id="dashboard">
+                        <h2 class="mb-4">Business Analytics Dashboard</h2>
+
+                        <div class="row">
+                            <div class="col-md-6 col-lg-3 mb-4">
+                                <div class="card dashboard-card stats-card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Total Appointments</h5>
+                                        <h1 class="display-4 mb-0">1,257</h1>
+                                        <p class="card-text mt-3">
+                                            <i class="bi bi-arrow-up"></i> 12% increase from last month
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 col-lg-3 mb-4">
+                                <div class="card dashboard-card stats-card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Patient Satisfaction</h5>
+                                        <h1 class="display-4 mb-0">87%</h1>
+                                        <p class="card-text mt-3">
+                                            <i class="bi bi-arrow-up"></i> 5% increase from last quarter
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 col-lg-3 mb-4">
+                                <div class="card dashboard-card stats-card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Cancellation Rate</h5>
+                                        <h1 class="display-4 mb-0">8.3%</h1>
+                                        <p class="card-text mt-3">
+                                            <i class="bi bi-arrow-down"></i> 2.1% decrease from last month
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 col-lg-3 mb-4">
+                                <div class="card dashboard-card stats-card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Average Wait Time</h5>
+                                        <h1 class="display-4 mb-0">12<small>min</small></h1>
+                                        <p class="card-text mt-3">
+                                            <i class="bi bi-arrow-down"></i> 3 min decrease from last quarter
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-8 mb-4">
+                                <div class="card dashboard-card">
+                                    <div class="card-header bg-white border-0">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h5 class="mb-0">Appointment Trends</h5>
+                                            <div class="btn-group btn-group-sm">
+                                                <button class="btn btn-outline-secondary active">Week</button>
+                                                <button class="btn btn-outline-secondary">Month</button>
+                                                <button class="btn btn-outline-secondary">Year</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas id="appointmentChart" width="100%" height="300"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 mb-4">
+                                <div class="card dashboard-card">
+                                    <div class="card-header bg-white border-0">
+                                        <h5 class="mb-0">Appointments by Department</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas id="departmentChart" width="100%" height="300"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="card dashboard-card">
+                                    <div class="card-header bg-white border-0">
+                                        <h5 class="mb-0">Resource Utilization</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-4">
+                                            <div class="d-flex justify-content-between mb-1">
+                                                <span>General Medicine</span>
+                                                <span>92% utilized</span>
+                                            </div>
+                                            <div class="progress">
+                                                <div class="progress-bar bg-success" role="progressbar" style="width: 92%"></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-4">
+                                            <div class="d-flex justify-content-between mb-1">
+                                                <span>Cardiology</span>
+                                                <span>78% utilized</span>
+                                            </div>
+                                            <div class="progress">
+                                                <div class="progress-bar bg-success" role="progressbar" style="width: 78%"></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-4">
+                                            <div class="d-flex justify-content-between mb-1">
+                                                <span>Dermatology</span>
+                                                <span>65% utilized</span>
+                                            </div>
+                                            <div class="progress">
+                                                <div class="progress-bar bg-success" role="progressbar" style="width: 65%"></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-4">
+                                            <div class="d-flex justify-content-between mb-1">
+                                                <span>Neurology</span>
+                                                <span>83% utilized</span>
+                                            </div>
+                                            <div class="progress">
+                                                <div class="progress-bar bg-success" role="progressbar" style="width: 83%"></div>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <div class="d-flex justify-content-between mb-1">
+                                                <span>Pediatrics</span>
+                                                <span>71% utilized</span>
+                                            </div>
+                                            <div class="progress">
+                                                <div class="progress-bar bg-success" role="progressbar" style="width: 71%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <div class="card dashboard-card">
+                                    <div class="card-header bg-white border-0">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h5 class="mb-0">Recent Feedback Analysis</h5>
+                                            <button class="btn btn-sm btn-outline-success">Generate Report</button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Department</th>
+                                                        <th>Feedback Score</th>
+                                                        <th>Sentiment</th>
+                                                        <th>Trend</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>General Medicine</td>
+                                                        <td>4.2/5</td>
+                                                        <td><span class="badge bg-success">Positive</span></td>
+                                                        <td><i class="bi bi-arrow-up text-success"></i></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Cardiology</td>
+                                                        <td>4.5/5</td>
+                                                        <td><span class="badge bg-success">Positive</span></td>
+                                                        <td><i class="bi bi-arrow-up text-success"></i></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Dermatology</td>
+                                                        <td>3.8/5</td>
+                                                        <td><span class="badge bg-warning text-dark">Neutral</span></td>
+                                                        <td><i class="bi bi-dash text-warning"></i></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Neurology</td>
+                                                        <td>4.1/5</td>
+                                                        <td><span class="badge bg-success">Positive</span></td>
+                                                        <td><i class="bi bi-arrow-up text-success"></i></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Pediatrics</td>
+                                                        <td>4.7/5</td>
+                                                        <td><span class="badge bg-success">Positive</span></td>
+                                                        <td><i class="bi bi-arrow-up text-success"></i></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Departments Tab -->
+                    <div class="tab-pane fade" id="departments">
+                        <h2 class="mb-4">Departments</h2>
+
+                        <div class="row">
+                            <div class="col-md-6 col-lg-4 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h4 class="card-title text-success">General Medicine</h4>
+                                        <p class="card-text">Primary healthcare services for adults, managing various conditions and providing preventive care.</p>
+                                        <ul class="list-group list-group-flush mb-3">
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                Available Doctors
+                                                <span class="badge bg-success rounded-pill">8</span>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                Available Time Slots
+                                                <span class="badge bg-success rounded-pill">42</span>
+                                            </li>
+                                        </ul>
+                                        <a href="#" class="btn btn-outline-success">Schedule Appointment</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 col-lg-4 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h4 class="card-title text-success">Cardiology</h4>
+                                        <p class="card-text">Specialized care for heart and cardiovascular conditions, including diagnostics and treatments.</p>
+                                        <ul class="list-group list-group-flush mb-3">
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                Available Doctors
+                                                <span class="badge bg-success rounded-pill">5</span>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                Available Time Slots
+                                                <span class="badge bg-success rounded-pill">28</span>
+                                            </li>
+                                        </ul>
+                                        <a href="#" class="btn btn-outline-success">Schedule Appointment</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 col-lg-4 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h4 class="card-title text-success">Dermatology</h4>
+                                        <p class="card-text">Diagnosis and treatment of skin, hair, and nail conditions for patients of all ages.</p>
+                                        <ul class="list-group list-group-flush mb-3">
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                Available Doctors
+                                                <span class="badge bg-success rounded-pill">4</span>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                Available Time Slots
+                                                <span class="badge bg-success rounded-pill">22</span>
+                                            </li>
+                                        </ul>
+                                        <a href="#" class="btn btn-outline-success">Schedule Appointment</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 col-lg-4 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h4 class="card-title text-success">Neurology</h4>
+                                        <p class="card-text">Medical specialty dealing with disorders of the nervous system, including brain and spinal cord.</p>
+                                        <ul class="list-group list-group-flush mb-3">
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                Available Doctors
+                                                <span class="badge bg-success rounded-pill">3</span>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                Available Time Slots
+                                                <span class="badge bg-success rounded-pill">18</span>
+                                            </li>
+                                        </ul>
+                                        <a href="#" class="btn btn-outline-success">Schedule Appointment</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 col-lg-4 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h4 class="card-title text-success">Pediatrics</h4>
+                                        <p class="card-text">Specialized healthcare for infants, children, and adolescents up to 18 years of age.</p>
+                                        <ul class="list-group list-group-flush mb-3">
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                Available Doctors
+                                                <span class="badge bg-success rounded-pill">6</span>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                Available Time Slots
+                                                <span class="badge bg-success rounded-pill">35</span>
+                                            </li>
+                                        </ul>
+                                        <a href="#" class="btn btn-outline-success">Schedule Appointment</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 col-lg-4 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h4 class="card-title text-success">Orthopedics</h4>
+                                        <p class="card-text">Treats conditions involving the musculoskeletal system, including bones, joints, and muscles.</p>
+                                        <ul class="list-group list-group-flush mb-3">
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                Available Doctors
+                                                <span class="badge bg-success rounded-pill">4</span>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                Available Time Slots
+                                                <span class="badge bg-success rounded-pill">26</span>
+                                            </li>
+                                        </ul>
+                                        <a href="#" class="btn btn-outline-success">Schedule Appointment</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Settings Tab -->
+                    <div class="tab-pane fade" id="settings">
+                        <h2 class="mb-4">Settings</h2>
+
+                        <div class="row">
+                            <div class="col-lg-8">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Appointment Settings</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <form>
+                                            <div class="mb-3">
+                                                <label class="form-label">Default Appointment Duration</label>
+                                                <div class="btn-group w-100" role="group">
+                                                    <input type="radio" class="btn-check" name="defaultDuration" id="defaultDuration15" autocomplete="off">
+                                                    <label class="btn btn-outline-success" for="defaultDuration15">15 min</label>
+
+                                                    <input type="radio" class="btn-check" name="defaultDuration" id="defaultDuration30" autocomplete="off" checked>
+                                                    <label class="btn btn-outline-success" for="defaultDuration30">30 min</label>
+
+                                                    <input type="radio" class="btn-check" name="defaultDuration" id="defaultDuration45" autocomplete="off">
+                                                    <label class="btn btn-outline-success" for="defaultDuration45">45 min</label>
+
+                                                    <input type="radio" class="btn-check" name="defaultDuration" id="defaultDuration60" autocomplete="off">
+                                                    <label class="btn btn-outline-success" for="defaultDuration60">1 h</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label">Buffer Time Between Appointments</label>
+                                                <select class="form-select">
                                                     <option value="0">No buffer time</option>
                                                     <option value="5">5 minutes</option>
                                                     <option value="10" selected>10 minutes</option>
                                                     <option value="15">15 minutes</option>
                                                     <option value="20">20 minutes</option>
                                                 </select>
-                            </div>
+                                            </div>
 
-                            <div class="mb-3">
-                                <label class="form-label">Advance Booking Window</label>
-                                <select class="form-select">
+                                            <div class="mb-3">
+                                                <label class="form-label">Advance Booking Window</label>
+                                                <select class="form-select">
                                                     <option value="1">1 month</option>
                                                     <option value="2">2 months</option>
                                                     <option value="3" selected>3 months</option>
                                                     <option value="6">6 months</option>
                                                 </select>
-                            </div>
+                                            </div>
 
-                            <div class="mb-3">
-                                <label class="form-label">Appointment Reminders</label>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="" id="emailReminder" checked>
-                                    <label class="form-check-label" for="emailReminder">
+                                            <div class="mb-3">
+                                                <label class="form-label">Appointment Reminders</label>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" value="" id="emailReminder" checked>
+                                                    <label class="form-check-label" for="emailReminder">
                                                         Email reminder
                                                     </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="" id="smsReminder" checked>
-                                    <label class="form-check-label" for="smsReminder">
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" value="" id="smsReminder" checked>
+                                                    <label class="form-check-label" for="smsReminder">
                                                         SMS reminder
                                                     </label>
-                                </div>
-                            </div>
+                                                </div>
+                                            </div>
 
-                            <div class="mb-3">
-                                <label class="form-label">Reminder Timing</label>
-                                <select class="form-select">
+                                            <div class="mb-3">
+                                                <label class="form-label">Reminder Timing</label>
+                                                <select class="form-select">
                                                     <option value="1">1 hour before</option>
                                                     <option value="3">3 hours before</option>
                                                     <option value="12">12 hours before</option>
                                                     <option value="24" selected>24 hours before</option>
                                                     <option value="48">48 hours before</option>
                                                 </select>
-                            </div>
+                                            </div>
 
-                            <div class="d-grid mt-4">
-                                <button type="submit" class="btn btn-success">Save Settings</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">Feedback System Settings</h5>
-                    </div>
-                    <div class="card-body">
-                        <form>
-                            <div class="mb-3">
-                                <label class="form-label">Automatically Request Feedback</label>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="autoRequestFeedback" checked>
-                                    <label class="form-check-label" for="autoRequestFeedback">Send feedback request after appointment</label>
+                                            <div class="d-grid mt-4">
+                                                <button type="submit" class="btn btn-success">Save Settings</button>
+                                            </div>
+                                        </form>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div class="mb-3">
-                                <label class="form-label">When to Send Feedback Request</label>
-                                <select class="form-select">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Feedback System Settings</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <form>
+                                            <div class="mb-3">
+                                                <label class="form-label">Automatically Request Feedback</label>
+                                                <div class="form-check form-switch">
+                                                    <input class="form-check-input" type="checkbox" id="autoRequestFeedback" checked>
+                                                    <label class="form-check-label" for="autoRequestFeedback">Send feedback request after appointment</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label">When to Send Feedback Request</label>
+                                                <select class="form-select">
                                                     <option value="0">Immediately after appointment</option>
                                                     <option value="1" selected>1 hour after appointment</option>
                                                     <option value="3">3 hours after appointment</option>
                                                     <option value="24">24 hours after appointment</option>
                                                 </select>
-                            </div>
+                                            </div>
 
-                            <div class="mb-3">
-                                <label class="form-label">Feedback Reminder</label>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="feedbackReminder" checked>
-                                    <label class="form-check-label" for="feedbackReminder">Send reminder if feedback not provided</label>
-                                </div>
-                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Feedback Reminder</label>
+                                                <div class="form-check form-switch">
+                                                    <input class="form-check-input" type="checkbox" id="feedbackReminder" checked>
+                                                    <label class="form-check-label" for="feedbackReminder">Send reminder if feedback not provided</label>
+                                                </div>
+                                            </div>
 
-                            <div class="mb-3">
-                                <label class="form-label">Feedback Privacy Settings</label>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="feedbackPrivacy" id="feedbackPrivate" checked>
-                                    <label class="form-check-label" for="feedbackPrivate">
+                                            <div class="mb-3">
+                                                <label class="form-label">Feedback Privacy Settings</label>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="feedbackPrivacy" id="feedbackPrivate" checked>
+                                                    <label class="form-check-label" for="feedbackPrivate">
                                                         Keep feedback private (internal use only)
                                                     </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="feedbackPrivacy" id="feedbackAnonymized">
-                                    <label class="form-check-label" for="feedbackAnonymized">
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="feedbackPrivacy" id="feedbackAnonymized">
+                                                    <label class="form-check-label" for="feedbackAnonymized">
                                                         Allow anonymized feedback to be shared
                                                     </label>
-                                </div>
-                            </div>
+                                                </div>
+                                            </div>
 
-                            <div class="d-grid mt-4">
-                                <button type="submit" class="btn btn-success">Save Settings</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">Working Hours</h5>
-                    </div>
-                    <div class="card-body">
-                        <form>
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <label class="form-label mb-0">Monday</label>
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" id="mondayActive" checked>
+                                            <div class="d-grid mt-4">
+                                                <button type="submit" class="btn btn-success">Save Settings</button>
+                                            </div>
+                                        </form>
                                     </div>
                                 </div>
-                                <div class="input-group">
-                                    <input type="time" class="form-control" value="09:00">
-                                    <span class="input-group-text">to</span>
-                                    <input type="time" class="form-control" value="17:00">
-                                </div>
                             </div>
 
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <label class="form-label mb-0">Tuesday</label>
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" id="tuesdayActive" checked>
+                            <div class="col-lg-4">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Working Hours</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <form>
+                                            <div class="mb-3">
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <label class="form-label mb-0">Monday</label>
+                                                    <div class="form-check form-switch">
+                                                        <input class="form-check-input" type="checkbox" id="mondayActive" checked>
+                                                    </div>
+                                                </div>
+                                                <div class="input-group">
+                                                    <input type="time" class="form-control" value="09:00">
+                                                    <span class="input-group-text">to</span>
+                                                    <input type="time" class="form-control" value="17:00">
+                                                </div>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <label class="form-label mb-0">Tuesday</label>
+                                                    <div class="form-check form-switch">
+                                                        <input class="form-check-input" type="checkbox" id="tuesdayActive" checked>
+                                                    </div>
+                                                </div>
+                                                <div class="input-group">
+                                                    <input type="time" class="form-control" value="09:00">
+                                                    <span class="input-group-text">to</span>
+                                                    <input type="time" class="form-control" value="17:00">
+                                                </div>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <label class="form-label mb-0">Wednesday</label>
+                                                    <div class="form-check form-switch">
+                                                        <input class="form-check-input" type="checkbox" id="wednesdayActive" checked>
+                                                    </div>
+                                                </div>
+                                                <div class="input-group">
+                                                    <input type="time" class="form-control" value="09:00">
+                                                    <span class="input-group-text">to</span>
+                                                    <input type="time" class="form-control" value="17:00">
+                                                </div>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <label class="form-label mb-0">Thursday</label>
+                                                    <div class="form-check form-switch">
+                                                        <input class="form-check-input" type="checkbox" id="thursdayActive" checked>
+                                                    </div>
+                                                </div>
+                                                <div class="input-group">
+                                                    <input type="time" class="form-control" value="09:00">
+                                                    <span class="input-group-text">to</span>
+                                                    <input type="time" class="form-control" value="17:00">
+                                                </div>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <label class="form-label mb-0">Friday</label>
+                                                    <div class="form-check form-switch">
+                                                        <input class="form-check-input" type="checkbox" id="fridayActive" checked>
+                                                    </div>
+                                                </div>
+                                                <div class="input-group">
+                                                    <input type="time" class="form-control" value="09:00">
+                                                    <span class="input-group-text">to</span>
+                                                    <input type="time" class="form-control" value="17:00">
+                                                </div>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <label class="form-label mb-0">Saturday</label>
+                                                    <div class="form-check form-switch">
+                                                        <input class="form-check-input" type="checkbox" id="saturdayActive">
+                                                    </div>
+                                                </div>
+                                                <div class="input-group">
+                                                    <input type="time" class="form-control" value="10:00" disabled>
+                                                    <span class="input-group-text">to</span>
+                                                    <input type="time" class="form-control" value="15:00" disabled>
+                                                </div>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <label class="form-label mb-0">Sunday</label>
+                                                    <div class="form-check form-switch">
+                                                        <input class="form-check-input" type="checkbox" id="sundayActive">
+                                                    </div>
+                                                </div>
+                                                <div class="input-group">
+                                                    <input type="time" class="form-control" value="10:00" disabled>
+                                                    <span class="input-group-text">to</span>
+                                                    <input type="time" class="form-control" value="15:00" disabled>
+                                                </div>
+                                            </div>
+
+                                            <div class="d-grid mt-4">
+                                                <button type="submit" class="btn btn-success">Save Working Hours</button>
+                                            </div>
+                                        </form>
                                     </div>
                                 </div>
-                                <div class="input-group">
-                                    <input type="time" class="form-control" value="09:00">
-                                    <span class="input-group-text">to</span>
-                                    <input type="time" class="form-control" value="17:00">
-                                </div>
                             </div>
-
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <label class="form-label mb-0">Wednesday</label>
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" id="wednesdayActive" checked>
-                                    </div>
-                                </div>
-                                <div class="input-group">
-                                    <input type="time" class="form-control" value="09:00">
-                                    <span class="input-group-text">to</span>
-                                    <input type="time" class="form-control" value="17:00">
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <label class="form-label mb-0">Thursday</label>
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" id="thursdayActive" checked>
-                                    </div>
-                                </div>
-                                <div class="input-group">
-                                    <input type="time" class="form-control" value="09:00">
-                                    <span class="input-group-text">to</span>
-                                    <input type="time" class="form-control" value="17:00">
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <label class="form-label mb-0">Friday</label>
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" id="fridayActive" checked>
-                                    </div>
-                                </div>
-                                <div class="input-group">
-                                    <input type="time" class="form-control" value="09:00">
-                                    <span class="input-group-text">to</span>
-                                    <input type="time" class="form-control" value="17:00">
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <label class="form-label mb-0">Saturday</label>
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" id="saturdayActive">
-                                    </div>
-                                </div>
-                                <div class="input-group">
-                                    <input type="time" class="form-control" value="10:00" disabled>
-                                    <span class="input-group-text">to</span>
-                                    <input type="time" class="form-control" value="15:00" disabled>
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <label class="form-label mb-0">Sunday</label>
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" id="sundayActive">
-                                    </div>
-                                </div>
-                                <div class="input-group">
-                                    <input type="time" class="form-control" value="10:00" disabled>
-                                    <span class="input-group-text">to</span>
-                                    <input type="time" class="form-control" value="15:00" disabled>
-                                </div>
-                            </div>
-
-                            <div class="d-grid mt-4">
-                                <button type="submit" class="btn btn-success">Save Working Hours</button>
-                            </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    </div>
-    </div>
-    </div>
     </div>
 
     <!-- Calendar Modal -->
@@ -1880,6 +1977,23 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+        // Mobile menu toggle functionality
+        document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('show');
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const mobileBtn = document.getElementById('mobileMenuBtn');
+
+            if (window.innerWidth <= 992 &&
+                !sidebar.contains(event.target) &&
+                !mobileBtn.contains(event.target)) {
+                sidebar.classList.remove('show');
+            }
+        });
+
         // Sample charts for the dashboard (would use real data in production)
         document.addEventListener('DOMContentLoaded', function() {
             // Feedback Chart
